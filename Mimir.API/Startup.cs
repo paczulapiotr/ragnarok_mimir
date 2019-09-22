@@ -28,7 +28,8 @@ namespace Mimir
         {
             services.AddControllers();
 
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer("Bearer", options =>
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer("Bearer", options =>
             {
                 options.Authority = Configuration["Security:AuthorityUrl"];
                 options.RequireHttpsMetadata = false;
@@ -40,9 +41,11 @@ namespace Mimir
                 // this defines a CORS policy called "default"
                 options.AddPolicy("default", policy =>
                 {
-                    policy.WithOrigins(Configuration["Security:ClientUrl"])
+                    policy
+                        .WithOrigins(Configuration["Security:ClientUrl"])
                         .AllowAnyHeader()
-                        .AllowAnyMethod();
+                        .AllowAnyMethod()
+                        .AllowCredentials();
                 });
             });
         }
@@ -61,11 +64,10 @@ namespace Mimir
             }
 
             app.UseHttpsRedirection();
-
+            app.UseCors("default");
             app.UseRouting();
-
+            app.UseAuthentication();
             app.UseAuthorization();
-
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
