@@ -1,17 +1,13 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-
+using Mimir.API.Hubs;
+using Mimir.Database;
+using Microsoft.EntityFrameworkCore.SqlServer;
+using Microsoft.EntityFrameworkCore;
 namespace Mimir
 {
     public class Startup
@@ -27,7 +23,9 @@ namespace Mimir
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
-
+            services.AddSignalR();
+            services.AddDbContext<MimirDbContext>(opts 
+                => opts.UseSqlServer(Configuration.GetConnectionString("Mimir")));
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer("Bearer", options =>
             {
@@ -56,13 +54,18 @@ namespace Mimir
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                using (var scope = app.ApplicationServices
+                    .GetRequiredService<IServiceScopeFactory>()
+                    .CreateScope())
+                {
+                    DataSeeder.Seed(scope.ServiceProvider);
+                }
             }
             else
             {
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
-
             app.UseHttpsRedirection();
             app.UseCors("default");
             app.UseRouting();
@@ -71,6 +74,7 @@ namespace Mimir
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapHub<MessageHub>("/message");
             });
         }
     }
