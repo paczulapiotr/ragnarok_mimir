@@ -6,9 +6,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Mimir.API.Hubs;
 using Mimir.Database;
-using Microsoft.EntityFrameworkCore.SqlServer;
 using Microsoft.EntityFrameworkCore;
-namespace Mimir
+namespace Mimir.API
 {
     public class Startup
     {
@@ -22,6 +21,7 @@ namespace Mimir
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            ServiceManager.RegisterServices(services);
             services.AddControllers();
             services.AddSignalR();
             services.AddDbContext<MimirDbContext>(opts 
@@ -33,7 +33,6 @@ namespace Mimir
                 options.RequireHttpsMetadata = false;
                 options.Audience = Configuration["Security:ApiName"];
             });
-
             services.AddCors(options =>
             {
                 // this defines a CORS policy called "default"

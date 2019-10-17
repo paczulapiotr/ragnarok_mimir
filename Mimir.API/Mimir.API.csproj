@@ -17,6 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Mimir.CQRS\Mimir.CQRS.csproj" />
     <ProjectReference Include="..\Mimir.Database\Mimir.Database.csproj" />
   </ItemGroup>
 
