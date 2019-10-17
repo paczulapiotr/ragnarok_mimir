@@ -5,9 +5,11 @@ VisualStudioVersion = 16.0.29021.104
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mimir.API", "Mimir.API\Mimir.API.csproj", "{0FEACD11-1A1F-46D3-B04D-FC5CE76EE8BB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mimir.Database", "Mimir.Database\Mimir.Database.csproj", "{834375DD-20B0-4930-A0B7-32D7575657AF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mimir.Database", "Mimir.Database\Mimir.Database.csproj", "{834375DD-20B0-4930-A0B7-32D7575657AF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mimir.Core", "Mimir.Core\Mimir.Core.csproj", "{D325DB2F-AC89-4DC8-9766-DBA6A8603832}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mimir.Core", "Mimir.Core\Mimir.Core.csproj", "{D325DB2F-AC89-4DC8-9766-DBA6A8603832}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mimir.CQRS", "Mimir.CQRS\Mimir.CQRS.csproj", "{252F3D36-BEC2-49EB-A8DD-A4A5A0CAE430}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{D325DB2F-AC89-4DC8-9766-DBA6A8603832}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D325DB2F-AC89-4DC8-9766-DBA6A8603832}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D325DB2F-AC89-4DC8-9766-DBA6A8603832}.Release|Any CPU.Build.0 = Release|Any CPU
+		{252F3D36-BEC2-49EB-A8DD-A4A5A0CAE430}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{252F3D36-BEC2-49EB-A8DD-A4A5A0CAE430}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{252F3D36-BEC2-49EB-A8DD-A4A5A0CAE430}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{252F3D36-BEC2-49EB-A8DD-A4A5A0CAE430}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
