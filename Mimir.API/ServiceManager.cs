@@ -1,9 +1,9 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System.Linq;
+using System.Reflection;
+using Microsoft.Extensions.DependencyInjection;
+using AutoMapper;
 using Mimir.CQRS.Commands;
 using Mimir.CQRS.Queries;
-using System;
-using System.Linq;
-using System.Reflection;
 
 namespace Mimir.API
 {
@@ -13,6 +13,18 @@ namespace Mimir.API
         {
             RegisterCommandHandlers(services);
             RegisterQueryHandlers(services);
+            RegisterAutomapper(services);
+        }
+
+        private static void RegisterAutomapper(IServiceCollection services)
+        {
+            var mapperConfigs = Assembly.GetExecutingAssembly()
+              .GetTypes()
+              .Where(x => x.IsSubclassOf(typeof(Profile)))
+              .ToList();
+            var config = new MapperConfiguration(cfg => mapperConfigs.ForEach(a => cfg.AddProfile(a)));
+            
+            services.AddSingleton(config);
         }
 
         private static void RegisterQueryHandlers(IServiceCollection services)
