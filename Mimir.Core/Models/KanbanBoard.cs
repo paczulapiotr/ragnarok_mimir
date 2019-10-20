@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Mimir.Core.Models
 {
-    public class KanbanBoard
+    public class KanbanBoard : TimestampRecord
     {
         [Key]
         public int ID { get; set; }

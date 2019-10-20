@@ -6,11 +6,9 @@ namespace Mimir.Core
 {
     public abstract class TimestampRecord
     {
-        [Timestamp]
-        public byte[] Timestamp { get; private set; }
+        [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
+        public DateTime Timestamp { get; private set; }
         
-        [NotMapped]
-        public string TimestampString { get => String.Join(".", Timestamp); }
-        public bool CompareTimestamp(string timestampString) => timestampString == TimestampString;
+        public bool CompareTimestamp(DateTime timestamp) => timestamp == Timestamp;
     }
 }

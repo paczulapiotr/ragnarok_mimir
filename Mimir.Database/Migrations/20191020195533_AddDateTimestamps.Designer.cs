@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Mimir.Database;
 
 namespace Mimir.Database.Migrations
 {
     [DbContext(typeof(MimirDbContext))]
-    partial class MimirDbContextModelSnapshot : ModelSnapshot
+    [Migration("20191020195533_AddDateTimestamps")]
+    partial class AddDateTimestamps
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
