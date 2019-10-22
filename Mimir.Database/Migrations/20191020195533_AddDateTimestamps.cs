@@ -31,8 +31,7 @@ namespace Mimir.Database.Migrations
             AS
                UPDATE dbo.KanbanItems
                SET Timestamp = SYSDATETIME()
-               FROM Inserted i
-               WHERE dbo.KanbanItems.ID = i.ID");
+               WHERE dbo.KanbanItems.ID in (SELECT ID FROM Inserted)");
 
             migrationBuilder.Sql(@"
             CREATE TRIGGER KanbanColumnModified
@@ -41,8 +40,7 @@ namespace Mimir.Database.Migrations
             AS
                UPDATE dbo.KanbanColumns
                SET Timestamp = SYSDATETIME()
-               FROM Inserted i
-               WHERE dbo.KanbanColumns.ID = i.ID");
+               WHERE dbo.KanbanColumns.ID in (SELECT ID FROM Inserted)");
 
             migrationBuilder.Sql(@"
             CREATE TRIGGER KanbanBoardModified
@@ -51,8 +49,7 @@ namespace Mimir.Database.Migrations
             AS
                UPDATE dbo.KanbanBoards
                SET Timestamp = SYSDATETIME()
-               FROM Inserted i
-               WHERE dbo.KanbanBoards.ID = i.ID");
+               WHERE dbo.KanbanBoards.ID in (SELECT ID FROM Inserted)");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

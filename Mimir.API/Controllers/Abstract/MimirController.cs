@@ -1,15 +1,14 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Mimir.API.Controllers.Filters;
 
-namespace Mimir.API.Controllers
+namespace Mimir.API.Controllers.Abstract
 {
     [ApiController]
     [Authorize]
     [Route("api/[controller]")]
-    public class AuthorizedController : ControllerBase
+    [ExceptionHandlerFilter]
+    public class MimirController : Controller
     {
-        public AuthorizedController()
-        {
-        }
     }
 }
