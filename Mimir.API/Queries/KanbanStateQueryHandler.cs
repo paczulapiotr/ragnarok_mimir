@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Mimir.API.Queries
 {
-    public class KanbanStateQueryHandler : IQueryHandler<KanbanStateQueryHandler.Query, KanbanBoardDTO>
+    public class KanbanStateQueryHandler : IQueryHandler<KanbanBoardDTO, KanbanStateQueryHandler.Query>
     {
         private readonly MimirDbContext _dbContext;
         private readonly IMapper _mapper;
@@ -29,7 +29,7 @@ namespace Mimir.API.Queries
             return result;
         }
 
-        public class Query : IQuery
+        public class Query : IQuery<KanbanBoardDTO>
         {
             public Query(int boardId)
             {

@@ -24,31 +24,32 @@ namespace Mimir.API.Controllers
         {
             _kanbanRepository.MoveItem(dto.BoardId, dto.ItemId, dto.Index, dto.ColumnDestId, dto.Timestamp);
 
-            var result = await _queryHandler.DispatchAsync<KanbanBoardDTO>(
-                new KanbanStateQueryHandler.Query(dto.BoardId));
-
-            return Json(new KanbanBoardDTO());
+            var result = await _queryHandler.DispatchAsync(new KanbanStateQueryHandler.Query(dto.BoardId));
+            return Ok(result);
         }
 
         [AllowAnonymous]
         public async Task<IActionResult> MoveColumn([FromBody] KanbanColumnMoveDTO dto)
         {
             _kanbanRepository.MoveColumn(dto.BoardId, dto.ColumnId, dto.Index, dto.Timestamp);
-            return Json(new KanbanBoardDTO());
+            var result = await _queryHandler.DispatchAsync(new KanbanStateQueryHandler.Query(dto.BoardId));
+            return Ok(result);
         }
 
         [AllowAnonymous]
         public async Task<IActionResult> AddColumn([FromBody] KanbanColumnAddDTO dto)
         {
             _kanbanRepository.AddColumn(dto.BoardId, dto.Name, dto.Timestamp);
-            return Json(new KanbanBoardDTO());
+            var result = await _queryHandler.DispatchAsync(new KanbanStateQueryHandler.Query(dto.BoardId));
+            return Ok(result);
         }
 
         [AllowAnonymous]
         public async Task<IActionResult> AddItem([FromBody] KanbanItemAddDTO dto)
         {
             _kanbanRepository.AddItem(dto.BoardId, dto.Name, dto.ColumnId, dto.Timestamp);
-            return Json(new KanbanBoardDTO());
+            var result = await _queryHandler.DispatchAsync(new KanbanStateQueryHandler.Query(dto.BoardId));
+            return Ok(result);
         }
     }
 }

@@ -12,16 +12,18 @@ namespace Mimir.CQRS.Queries
             _serviceProvider = serviceProvider;
         }
 
-        public async Task<TResult> DispatchAsync<TResult, TQuery>(TQuery query) where TQuery : IQuery
+        public async Task<TResult> DispatchAsync<TResult>(IQuery<TResult> query)
         {
-            var queryHandler = _serviceProvider.GetService(typeof(IQueryHandler<TResult, TQuery>)) as IQueryHandler<TResult, TQuery>;
+            var handlerType = typeof(IQueryHandler<,>).MakeGenericType(typeof(TResult), query.GetType());
+            dynamic queryHandler = _serviceProvider.GetService(handlerType);
+
             if (queryHandler != null)
             {
                 return await queryHandler.HandleAsync(query);
             }
             else
             {
-                throw new ArgumentException($"There is no query handler for query type: {typeof(TQuery)} with result types: {typeof(TResult)}");
+                throw new ArgumentException($"There is no query handler for query type: {query.GetType()} with result types: {typeof(TResult)}");
             }
         }
     }
