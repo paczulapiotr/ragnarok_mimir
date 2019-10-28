@@ -20,10 +20,13 @@
   <ItemGroup>
     <ProjectReference Include="..\Mimir.CQRS\Mimir.CQRS.csproj" />
     <ProjectReference Include="..\Mimir.Database\Mimir.Database.csproj" />
+    <ProjectReference Include="..\Mimir.Kanban\Mimir.Kanban.csproj" />
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Commands\" />
     <Folder Include="Mapper\" />
+    <Folder Include="Queries\" />
   </ItemGroup>
 
 </Project>

@@ -12,9 +12,9 @@ namespace Mimir.CQRS.Queries
             _serviceProvider = serviceProvider;
         }
 
-        public async Task<TResult> DispatchAsync<TQuery, TResult>(TQuery query) where TQuery : IQuery
+        public async Task<TResult> DispatchAsync<TResult, TQuery>(TQuery query) where TQuery : IQuery
         {
-            var queryHandler = _serviceProvider.GetService(typeof(IQueryHandler<TQuery, TResult>)) as IQueryHandler<TQuery, TResult>;
+            var queryHandler = _serviceProvider.GetService(typeof(IQueryHandler<TResult, TQuery>)) as IQueryHandler<TResult, TQuery>;
             if (queryHandler != null)
             {
                 return await queryHandler.HandleAsync(query);

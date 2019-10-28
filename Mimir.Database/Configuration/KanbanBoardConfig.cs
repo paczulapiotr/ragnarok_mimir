@@ -12,6 +12,7 @@ namespace Mimir.Database.Configuration
         public void Configure(EntityTypeBuilder<KanbanBoard> builder)
         {
             builder.HasOne(x => x.Owner).WithMany(x => x.OwnedBoards);
+            builder.HasMany(x => x.Columns).WithOne(x => x.Board).OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

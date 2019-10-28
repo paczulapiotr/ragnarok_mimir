@@ -11,6 +11,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mimir.Core", "Mimir.Core\Mi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mimir.CQRS", "Mimir.CQRS\Mimir.CQRS.csproj", "{252F3D36-BEC2-49EB-A8DD-A4A5A0CAE430}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mimir.Kanban", "Mimir.Kanban\Mimir.Kanban.csproj", "{46349C35-1AB2-451B-944D-8949BE972443}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{252F3D36-BEC2-49EB-A8DD-A4A5A0CAE430}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{252F3D36-BEC2-49EB-A8DD-A4A5A0CAE430}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{252F3D36-BEC2-49EB-A8DD-A4A5A0CAE430}.Release|Any CPU.Build.0 = Release|Any CPU
+		{46349C35-1AB2-451B-944D-8949BE972443}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{46349C35-1AB2-451B-944D-8949BE972443}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{46349C35-1AB2-451B-944D-8949BE972443}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{46349C35-1AB2-451B-944D-8949BE972443}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using AutoMapper;
 using Mimir.CQRS.Commands;
 using Mimir.CQRS.Queries;
+using Mimir.Kanban;
 
 namespace Mimir.API
 {
@@ -14,6 +15,8 @@ namespace Mimir.API
             RegisterCommandHandlers(services);
             RegisterQueryHandlers(services);
             RegisterAutomapper(services);
+            services.AddScoped<IIndexableHelper, IndexableHelper>();
+            services.AddScoped<IKanbanRepository, SqlKanbanRepository>();
         }
 
         private static void RegisterAutomapper(IServiceCollection services)

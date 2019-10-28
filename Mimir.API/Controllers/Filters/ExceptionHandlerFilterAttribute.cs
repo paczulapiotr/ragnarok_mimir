@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Mimir.API.Result;
-using Mimir.Core.CommonExceptions;
+using Mimir.API.CommonExceptions;
 using System;
 
 namespace Mimir.API.Controllers.Filters

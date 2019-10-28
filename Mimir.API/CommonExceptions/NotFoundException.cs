@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Mimir.Core.CommonExceptions
+namespace Mimir.API.CommonExceptions
 {
 
     public class NotFoundException : Exception

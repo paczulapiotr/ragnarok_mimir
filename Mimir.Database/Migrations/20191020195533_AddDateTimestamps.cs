@@ -27,7 +27,7 @@ namespace Mimir.Database.Migrations
             migrationBuilder.Sql(@"
             CREATE TRIGGER KanbanItemModified
             ON dbo.KanbanItems
-            AFTER UPDATE 
+            AFTER UPDATE, INSERT 
             AS
                UPDATE dbo.KanbanItems
                SET Timestamp = SYSDATETIME()
@@ -36,7 +36,7 @@ namespace Mimir.Database.Migrations
             migrationBuilder.Sql(@"
             CREATE TRIGGER KanbanColumnModified
             ON dbo.KanbanColumns
-            AFTER UPDATE 
+            AFTER UPDATE, INSERT
             AS
                UPDATE dbo.KanbanColumns
                SET Timestamp = SYSDATETIME()
@@ -45,7 +45,7 @@ namespace Mimir.Database.Migrations
             migrationBuilder.Sql(@"
             CREATE TRIGGER KanbanBoardModified
             ON dbo.KanbanBoards
-            AFTER UPDATE 
+            AFTER UPDATE, INSERT
             AS
                UPDATE dbo.KanbanBoards
                SET Timestamp = SYSDATETIME()
