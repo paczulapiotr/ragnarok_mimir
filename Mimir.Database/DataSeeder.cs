@@ -41,37 +41,17 @@ namespace Mimir.Database
                         context.SaveChanges();
                     }
 
-                    var columnsOne = new[]
-                    {
-                        new KanbanColumn{ Index=0 },
-                        new KanbanColumn{ Index=1 },
-                        new KanbanColumn{ Index=2 },
-                    }.ToList();
-                    var columnsTwo = new[]
-                   {
-                        new KanbanColumn{ Index=0 },
-                        new KanbanColumn{ Index=1 },
-                        new KanbanColumn{ Index=2 },
-                    }.ToList();
-                    if (!context.KanbanColumns.Any())
-                    {
-                        context.KanbanColumns.AddRange(columnsOne.Concat(columnsTwo));
-                        context.SaveChanges();
-                    }
-
                     var boards = new[]
                     {
                         new KanbanBoard{
                             Name="Board One",
                             Description="Description One",
                             Owner=users[0],
-                            Columns = columnsOne
                         },
                         new KanbanBoard{
                             Name="Board Two",
                             Description="Description Two",
                             Owner=users[1],
-                            Columns = columnsTwo
                         }
                     };
                     if (!context.KanbanBoards.Any())
@@ -79,6 +59,26 @@ namespace Mimir.Database
                         context.KanbanBoards.AddRange(boards);
                         context.SaveChanges();
                     }
+
+
+                    var columnsOne = new[]
+{
+                        new KanbanColumn{ Index=0, Board = boards[0] },
+                        new KanbanColumn{ Index=1, Board = boards[0] },
+                        new KanbanColumn{ Index=2, Board = boards[0] },
+                    }.ToList();
+                    var columnsTwo = new[]
+                   {
+                        new KanbanColumn{ Index=0, Board = boards[1] },
+                        new KanbanColumn{ Index=1, Board = boards[1] },
+                        new KanbanColumn{ Index=2, Board = boards[1] },
+                    }.ToList();
+                    if (!context.KanbanColumns.Any())
+                    {
+                        context.KanbanColumns.AddRange(columnsOne.Concat(columnsTwo));
+                        context.SaveChanges();
+                    }
+
                     transaction.Commit();
                 }
                 catch (Exception ex)

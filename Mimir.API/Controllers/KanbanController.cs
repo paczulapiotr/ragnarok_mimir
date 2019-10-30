@@ -74,7 +74,7 @@ namespace Mimir.API.Controllers
         }
 
         [AllowAnonymous]
-        [HttpGet("{boardId:int}")]
+        [HttpGet("{boardId}")]
         public Task<IActionResult> Board(int boardId)
         {
             return KanbanStateResult(boardId);

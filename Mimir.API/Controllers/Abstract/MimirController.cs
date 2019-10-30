@@ -6,9 +6,9 @@ using Mimir.API.Result;
 
 namespace Mimir.API.Controllers.Abstract
 {
-    [ApiController]
     [Authorize]
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[action]")]
+    [ApiController]
     [ExceptionHandlerFilter]
     public class MimirController : Controller
     {

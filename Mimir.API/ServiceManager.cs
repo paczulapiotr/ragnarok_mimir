@@ -33,7 +33,7 @@ namespace Mimir.API
         private static void RegisterQueryHandlers(IServiceCollection services)
         {
             services.AddScoped<QueryDispatcher>();
-            var queryHandlers = Assembly.GetAssembly(typeof(IQueryHandler<,>))
+            var queryHandlers = Assembly.GetExecutingAssembly()
                  .GetTypes()
                  .Where(x => x.GetInterfaces().Any(x => x.IsGenericType
                                                     && x.GetGenericTypeDefinition() == typeof(IQueryHandler<,>)));
@@ -53,7 +53,7 @@ namespace Mimir.API
         private static void RegisterCommandHandlers(IServiceCollection services)
         {
             services.AddScoped<CommandDispatcher>();
-            var commandHandlers = Assembly.GetAssembly(typeof(ICommandHandler<>))
+            var commandHandlers = Assembly.GetExecutingAssembly()
                 .GetTypes()
                 .Where(x => x.GetInterfaces().Any(x => x.IsGenericType 
                                                     && x.GetGenericTypeDefinition() == typeof(ICommandHandler<>)));
