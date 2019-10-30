@@ -2,9 +2,9 @@
 
 namespace Mimir.API.DTO
 {
-    public class KanbanColumnAddDTO
+    public class KanbanItemRemoveDTO
     {
-        public string Name { get; set; }
+        public int ItemId { get; set; }
         public int BoardId { get; set; }
         public DateTime Timestamp { get; set; }
     }

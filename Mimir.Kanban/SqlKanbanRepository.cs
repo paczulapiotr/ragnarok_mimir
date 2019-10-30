@@ -92,5 +92,22 @@ namespace Mimir.Kanban
             _dbContext.SaveChanges();
             return true; 
         }
+
+        public void RemoveItem(int boardId, int itemId, DateTime timestamp)
+        {
+            var item = _dbContext.KanbanItems.FirstOrDefault(x => x.ID == itemId);
+            _dbContext.Remove(item);
+            _dbContext.SaveChanges();
+        }
+
+        public void RemoveColumn(int boardId, int columnId, DateTime timestamp)
+        {
+            var column = _dbContext.KanbanColumns.FirstOrDefault(x => x.ID == columnId);
+            if (column.Items.Any())
+                return;
+            
+            _dbContext.Remove(column);
+            _dbContext.SaveChanges();
+        }
     }
 }
