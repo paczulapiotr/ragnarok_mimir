@@ -63,19 +63,66 @@ namespace Mimir.Database
 
                     var columnsOne = new[]
 {
-                        new KanbanColumn{ Index=0, Board = boards[0] },
-                        new KanbanColumn{ Index=1, Board = boards[0] },
-                        new KanbanColumn{ Index=2, Board = boards[0] },
+                        new KanbanColumn{ Index=0, Name="Board_0_col_0", Board = boards[0] },
+                        new KanbanColumn{ Index=1, Name="Board_0_col_1", Board = boards[0] },
+                        new KanbanColumn{ Index=2, Name="Board_0_col_2", Board = boards[0] },
                     }.ToList();
                     var columnsTwo = new[]
                    {
-                        new KanbanColumn{ Index=0, Board = boards[1] },
-                        new KanbanColumn{ Index=1, Board = boards[1] },
-                        new KanbanColumn{ Index=2, Board = boards[1] },
+                        new KanbanColumn{ Index=0, Name="Board_1_col_0", Board = boards[1] },
+                        new KanbanColumn{ Index=1, Name="Board_1_col_1", Board = boards[1] },
+                        new KanbanColumn{ Index=2, Name="Board_1_col_2", Board = boards[1] },
                     }.ToList();
                     if (!context.KanbanColumns.Any())
                     {
                         context.KanbanColumns.AddRange(columnsOne.Concat(columnsTwo));
+                        context.SaveChanges();
+                    }
+
+
+                    var itemsOne = new[]
+                    {
+                        new KanbanItem
+                        {
+                            Index = 0,
+                            Name = "Col_0_item_1",
+                            Column = columnsOne[0],
+                        },
+                        new KanbanItem
+                        {
+                            Index = 1,
+                            Name = "Col_0_item_2",
+                            Column = columnsOne[0],
+                        },
+                        new KanbanItem
+                        {
+                            Index = 2,
+                            Name = "Col_0_item_3",
+                            Column = columnsOne[0],
+                        },
+                               new KanbanItem
+                        {
+                            Index = 0,
+                            Name = "Col_1_item_1",
+                            Column = columnsOne[1],
+                        },
+                        new KanbanItem
+                        {
+                            Index = 1,
+                            Name = "Col_1_item_2",
+                            Column = columnsOne[1],
+                        },
+                        new KanbanItem
+                        {
+                            Index = 2,
+                            Name = "Col_1_item_3",
+                            Column = columnsOne[1],
+                        },
+                    };
+
+                    if (!context.KanbanItems.Any())
+                    {
+                        context.KanbanItems.AddRange(itemsOne);
                         context.SaveChanges();
                     }
 
