@@ -17,10 +17,23 @@ namespace Mimir.Kanban
         public void ReorderIndexable(IEnumerable<IIndexable> indexables, int oldIndex, int newIndex)
         {
             var toMove = indexables.FirstOrDefault(x => x.Index == oldIndex);
+            if (oldIndex > newIndex)
+            {
+                indexables.Where(x => x.Index >= newIndex)
+                        .ToList()
+                        .ForEach(x => x.Index++);
+            }
+            else if (oldIndex < newIndex)
+            {
+                indexables.Where(x => x.Index <= newIndex)
+                        .ToList()
+                        .ForEach(x => x.Index--);
+            }
+            else
+            {
+                return;
+            }
 
-            indexables.Where(x => x.Index >= newIndex)
-                .ToList()
-                .ForEach(x => x.Index++);
             toMove.Index = newIndex;
 
             RemapIndexes(indexables);

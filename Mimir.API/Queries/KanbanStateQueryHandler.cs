@@ -21,6 +21,7 @@ namespace Mimir.API.Queries
         public async Task<KanbanBoardDTO> HandleAsync(Query query)
         {
             var board = await _dbContext.KanbanBoards
+                .AsNoTracking()
                 .Include(x => x.Columns).ThenInclude(x => x.Items)
                 .FirstOrDefaultAsync(x => x.ID == query.BoardId);
 

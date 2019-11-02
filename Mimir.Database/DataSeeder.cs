@@ -65,13 +65,11 @@ namespace Mimir.Database
 {
                         new KanbanColumn{ Index=0, Name="Board_0_col_0", Board = boards[0] },
                         new KanbanColumn{ Index=1, Name="Board_0_col_1", Board = boards[0] },
-                        new KanbanColumn{ Index=2, Name="Board_0_col_2", Board = boards[0] },
                     }.ToList();
                     var columnsTwo = new[]
                    {
                         new KanbanColumn{ Index=0, Name="Board_1_col_0", Board = boards[1] },
                         new KanbanColumn{ Index=1, Name="Board_1_col_1", Board = boards[1] },
-                        new KanbanColumn{ Index=2, Name="Board_1_col_2", Board = boards[1] },
                     }.ToList();
                     if (!context.KanbanColumns.Any())
                     {
