@@ -2,6 +2,7 @@
 using Mimir.Database;
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Mimir.Kanban
 {
@@ -32,7 +33,7 @@ namespace Mimir.Kanban
 
      
 
-        public bool AddColumn(int boardId, string name, DateTime timestamp)
+        public async Task AddColumnAsync(int boardId, string name, DateTime timestamp)
         {
             var newColumn = new KanbanColumn
             {
@@ -42,11 +43,10 @@ namespace Mimir.Kanban
             };
 
             _dbContext.KanbanColumns.Add(newColumn);
-            _dbContext.SaveChanges();
-            return true;
+            await _dbContext.SaveChangesAsync();
         }
 
-        public bool AddItem(int boardId, string name, int columnId, DateTime timestamp)
+        public async Task AddItemAsync(int boardId, string name, int columnId, DateTime timestamp)
         {
             var newItem = new KanbanItem
             {
@@ -56,11 +56,10 @@ namespace Mimir.Kanban
             };
 
             _dbContext.KanbanItems.Add(newItem);
-            _dbContext.SaveChanges();
-            return true;
+            await _dbContext.SaveChangesAsync();
         }
 
-        public bool MoveColumn(int boardId, int columnId, int index, DateTime timestamp)
+        public async Task MoveColumnAsync(int boardId, int columnId, int index, DateTime timestamp)
         {
             var columns = _dbContext.KanbanColumns
                 .Where(x => x.KanbanBoardID == boardId)
@@ -70,10 +69,11 @@ namespace Mimir.Kanban
             var columnsToRemap = columns.Where(x => x.Index >= columnToMove.Index);
 
             _indexableHelper.ReorderIndexable(columnsToRemap, columnToMove.Index, index);
-            return true;
+
+            await _dbContext.SaveChangesAsync();
         }
 
-        public bool MoveItem(int boardId, int itemId, int index, int? destColumnId, DateTime timestamp)
+        public async Task MoveItemAsync(int boardId, int itemId, int index, int? destColumnId, DateTime timestamp)
         {
             var items = _dbContext.KanbanItems
                 .Where(x => x.ColumnID == destColumnId || x.ID == itemId)
@@ -89,25 +89,24 @@ namespace Mimir.Kanban
                 item.ColumnID = destColumnId.Value;
                 _indexableHelper.MoveIndexable(items, item, index);
             }
-            _dbContext.SaveChanges();
-            return true; 
+            await _dbContext.SaveChangesAsync();
         }
 
-        public void RemoveItem(int boardId, int itemId, DateTime timestamp)
+        public async Task RemoveItemAsync(int boardId, int itemId, DateTime timestamp)
         {
             var item = _dbContext.KanbanItems.FirstOrDefault(x => x.ID == itemId);
             _dbContext.Remove(item);
-            _dbContext.SaveChanges();
+            await _dbContext.SaveChangesAsync();
         }
 
-        public void RemoveColumn(int boardId, int columnId, DateTime timestamp)
+        public async Task RemoveColumnAsync(int boardId, int columnId, DateTime timestamp)
         {
             var column = _dbContext.KanbanColumns.FirstOrDefault(x => x.ID == columnId);
             if (column.Items.Any())
                 return;
             
             _dbContext.Remove(column);
-            _dbContext.SaveChanges();
+            await _dbContext.SaveChangesAsync();
         }
     }
 }

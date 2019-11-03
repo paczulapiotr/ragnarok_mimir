@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Mimir.API.CommonExceptions
+namespace Mimir.Core.CommonExceptions
 {
 
     public class ConflictException : Exception

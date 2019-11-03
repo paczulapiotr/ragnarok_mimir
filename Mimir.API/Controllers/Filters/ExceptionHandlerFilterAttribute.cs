@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Mimir.API.Result;
-using Mimir.API.CommonExceptions;
 using System;
+using Mimir.Core.CommonExceptions;
 
 namespace Mimir.API.Controllers.Filters
 {

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Mimir.API.Controllers.Filters;
 using Mimir.API.Result;
+using Mimir.Core.Models;
 
 namespace Mimir.API.Controllers.Abstract
 {
@@ -12,6 +13,15 @@ namespace Mimir.API.Controllers.Abstract
     [ExceptionHandlerFilter]
     public class MimirController : Controller
     {
+        protected readonly IUserResolver _userResolver;
+
+        public MimirController(IUserResolver userResolver)
+        {
+            _userResolver = userResolver;
+        }
+
+        protected AppUser GetUser() => _userResolver.GetUser(User);
+
         public override OkObjectResult Ok([ActionResultObjectValue] object value)
         {
             return base.Ok(new ApiJsonResponse(value));

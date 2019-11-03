@@ -17,6 +17,8 @@ namespace Mimir.API
             RegisterAutomapper(services);
             services.AddScoped<IIndexableHelper, IndexableHelper>();
             services.AddScoped<IKanbanRepository, SqlKanbanRepository>();
+            services.AddScoped<IKanbanAccessService, KanbanAccessService>();
+            services.AddScoped<IUserResolver, UserResolver>();
         }
 
         private static void RegisterAutomapper(IServiceCollection services)
@@ -35,6 +37,7 @@ namespace Mimir.API
             services.AddScoped<QueryDispatcher>();
             var queryHandlers = Assembly.GetExecutingAssembly()
                  .GetTypes()
+                 .Where(x => !x.IsAbstract)
                  .Where(x => x.GetInterfaces().Any(x => x.IsGenericType
                                                     && x.GetGenericTypeDefinition() == typeof(IQueryHandler<,>)));
 
@@ -55,6 +58,7 @@ namespace Mimir.API
             services.AddScoped<CommandDispatcher>();
             var commandHandlers = Assembly.GetExecutingAssembly()
                 .GetTypes()
+                .Where(x => !x.IsAbstract)
                 .Where(x => x.GetInterfaces().Any(x => x.IsGenericType 
                                                     && x.GetGenericTypeDefinition() == typeof(ICommandHandler<>)));
 

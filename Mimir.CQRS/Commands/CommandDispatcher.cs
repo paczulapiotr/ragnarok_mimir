@@ -11,12 +11,12 @@ namespace Mimir.CQRS.Commands
             _serviceProvider = serviceProvider;
         }
 
-        public async Task<ICommandResult> DispatchAsync<TCommand>(TCommand command) where TCommand : ICommand
+        public async Task DispatchAsync<TCommand>(TCommand command) where TCommand : ICommand
         {
             var commandHandler = _serviceProvider.GetService(typeof(ICommandHandler<TCommand>)) as ICommandHandler<TCommand>;
             if (commandHandler != null)
             {
-                return await commandHandler.HandleAsync(command);
+                await commandHandler.HandleAsync(command);
             }
             else
             {
