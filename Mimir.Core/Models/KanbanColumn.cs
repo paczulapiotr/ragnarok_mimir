@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Mimir.Core.Models
 {
-    public class KanbanColumn : TimestampRecord, IIndexable
+    public class KanbanColumn : IIndexable
     {
         [Key]
         public int ID { get; set; }

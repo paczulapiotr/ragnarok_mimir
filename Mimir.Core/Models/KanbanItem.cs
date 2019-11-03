@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Mimir.Core.Models
 {
-    public class KanbanItem : TimestampRecord, IIndexable
+    public class KanbanItem : IIndexable
     {
         [Key]
         public int ID { get; set; }
