@@ -5,6 +5,7 @@ using AutoMapper;
 using Mimir.CQRS.Commands;
 using Mimir.CQRS.Queries;
 using Mimir.Kanban;
+using Mimir.Database;
 
 namespace Mimir.API
 {

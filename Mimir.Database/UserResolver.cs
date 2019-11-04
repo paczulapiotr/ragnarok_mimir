@@ -1,9 +1,8 @@
 ﻿using System.Linq;
 using System.Security.Claims;
 using Mimir.Core.Models;
-using Mimir.Database;
 
-namespace Mimir.API
+namespace Mimir.Database
 {
     public interface IUserResolver
     {

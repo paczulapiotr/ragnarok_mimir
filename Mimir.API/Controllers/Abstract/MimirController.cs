@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Mimir.API.Controllers.Filters;
 using Mimir.API.Result;
 using Mimir.Core.Models;
+using Mimir.Database;
 
 namespace Mimir.API.Controllers.Abstract
 {

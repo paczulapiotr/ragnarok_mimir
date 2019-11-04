@@ -1,8 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Diagnostics;
 
 namespace Mimir.Core.Models
 {
+    [DebuggerDisplay("{Name}, ID: {ID}, Index: {Index}, ColumnID: {ColumnID}")]
     public class KanbanItem : IIndexable
     {
         [Key]

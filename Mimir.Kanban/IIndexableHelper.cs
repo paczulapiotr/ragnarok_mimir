@@ -5,7 +5,8 @@ namespace Mimir.Kanban
 {
     public interface IIndexableHelper
     {
-        void ReorderIndexable(IEnumerable<IIndexable> indexables, int oldIndex, int newIndex);
-        void MoveIndexable(IEnumerable<IIndexable> indexables, IIndexable @new, int newIndex);
+        void RemapIndexes(IEnumerable<IIndexable> indexables, int startingIndex = 0);
+        void MoveIndexable(IEnumerable<IIndexable> indexables, int oldIndex, int newIndex);
+        void AddIndexable(IEnumerable<IIndexable> indexables, IIndexable @new, int newIndex);
     }
 }

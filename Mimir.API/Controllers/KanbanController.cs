@@ -6,6 +6,7 @@ using Mimir.API.DTO;
 using Mimir.API.Queries;
 using Mimir.CQRS.Commands;
 using Mimir.CQRS.Queries;
+using Mimir.Database;
 using System.Threading.Tasks;
 
 namespace Mimir.API.Controllers
