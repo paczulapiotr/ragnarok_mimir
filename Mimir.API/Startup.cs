@@ -44,6 +44,15 @@ namespace Mimir.API
                         .AllowAnyMethod()
                         .AllowCredentials();
                 });
+                // this defines a CORS policy for IdentityServer requests
+                options.AddPolicy("IdentityServer", policy =>
+                {
+                    policy
+                        .WithOrigins(Configuration["Security:AuthorityUrl"])
+                        .AllowAnyHeader()
+                        .AllowAnyMethod()
+                        .AllowCredentials();
+                });
             });
         }
 
@@ -66,8 +75,8 @@ namespace Mimir.API
                 app.UseHsts();
             }
             app.UseHttpsRedirection();
-            app.UseCors("default");
             app.UseRouting();
+            app.UseCors("default");
             app.UseAuthentication();
             app.UseAuthorization();
             app.UseEndpoints(endpoints =>

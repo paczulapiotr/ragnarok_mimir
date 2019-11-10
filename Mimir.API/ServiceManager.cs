@@ -7,6 +7,7 @@ using Mimir.CQRS.Queries;
 using Mimir.Kanban;
 using Mimir.Database;
 using Microsoft.AspNetCore.Http;
+using Mimir.API.Repositories;
 
 namespace Mimir.API
 {
@@ -22,6 +23,7 @@ namespace Mimir.API
             services.AddScoped<IKanbanRepository, SqlKanbanRepository>();
             services.AddScoped<IKanbanAccessService, KanbanAccessService>();
             services.AddScoped<IUserResolver, UserResolver>();
+            services.AddScoped<IUserRepository, UserRepository>();
         }
 
         private static void RegisterAutomapper(IServiceCollection services)
