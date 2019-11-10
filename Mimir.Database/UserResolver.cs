@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Security.Claims;
+using Mimir.Core.CommonExceptions;
 using Mimir.Core.Models;
 
 namespace Mimir.Database
@@ -23,7 +24,7 @@ namespace Mimir.Database
             var authId = claimsPrincipal.Claims.SingleOrDefault(c => c.Type.Equals(ClaimTypes.NameIdentifier))?.Value;
             if (string.IsNullOrWhiteSpace(authId))
             {
-                return null;
+                throw new UnauthorizedException("Given user is not valid");
             }
 
             return _dbContext.AppUsers.FirstOrDefault(x => x.AuthID == authId);

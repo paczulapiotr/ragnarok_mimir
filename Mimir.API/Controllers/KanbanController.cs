@@ -22,7 +22,7 @@ namespace Mimir.API.Controllers
             _commandDispatcher = commandDispatcher;
             _queryHandler = queryHandler;
         }
-        [AllowAnonymous]
+
         [HttpPost]
         public async Task<IActionResult> MoveItem([FromBody] KanbanItemMoveDTO dto)
         {
@@ -33,7 +33,6 @@ namespace Mimir.API.Controllers
             return await KanbanStateResult(dto.BoardId);
         }
 
-        [AllowAnonymous]
         [HttpPost]
         public async Task<IActionResult> MoveColumn([FromBody] KanbanColumnMoveDTO dto)
         {
@@ -44,7 +43,6 @@ namespace Mimir.API.Controllers
             return await KanbanStateResult(dto.BoardId);
         }
 
-        [AllowAnonymous]
         [HttpPost]
         public async Task<IActionResult> AddColumn([FromBody] KanbanColumnAddDTO dto)
         {
@@ -55,7 +53,6 @@ namespace Mimir.API.Controllers
             return await KanbanStateResult(dto.BoardId);
         }
 
-        [AllowAnonymous]
         [HttpPost]
         public async Task<IActionResult> AddItem([FromBody] KanbanItemAddDTO dto)
         {
@@ -66,7 +63,6 @@ namespace Mimir.API.Controllers
             return await KanbanStateResult(dto.BoardId);
         }
 
-        [AllowAnonymous]
         [HttpPost]
         public async Task<IActionResult> RemoveColumn([FromBody] KanbanColumnRemoveDTO dto)
         {
@@ -77,7 +73,6 @@ namespace Mimir.API.Controllers
             return await KanbanStateResult(dto.BoardId);
         }
 
-        [AllowAnonymous]
         [HttpPost]
         public async Task<IActionResult> RemoveItem([FromBody] KanbanItemRemoveDTO dto)
         {
@@ -88,7 +83,6 @@ namespace Mimir.API.Controllers
             return await KanbanStateResult(dto.BoardId);
         }
 
-        [AllowAnonymous]
         [HttpGet("{boardId}")]
         public Task<IActionResult> Board(int boardId)
         {

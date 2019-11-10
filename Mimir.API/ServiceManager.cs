@@ -6,6 +6,7 @@ using Mimir.CQRS.Commands;
 using Mimir.CQRS.Queries;
 using Mimir.Kanban;
 using Mimir.Database;
+using Microsoft.AspNetCore.Http;
 
 namespace Mimir.API
 {
@@ -16,6 +17,7 @@ namespace Mimir.API
             RegisterCommandHandlers(services);
             RegisterQueryHandlers(services);
             RegisterAutomapper(services);
+            services.AddHttpContextAccessor();
             services.AddScoped<IIndexableHelper, IndexableHelper>();
             services.AddScoped<IKanbanRepository, SqlKanbanRepository>();
             services.AddScoped<IKanbanAccessService, KanbanAccessService>();
@@ -35,7 +37,7 @@ namespace Mimir.API
 
         private static void RegisterQueryHandlers(IServiceCollection services)
         {
-            services.AddScoped<QueryDispatcher>();
+            services.AddScoped<IQueryDispatcher, QueryDispatcher>();
             var queryHandlers = Assembly.GetExecutingAssembly()
                  .GetTypes()
                  .Where(x => !x.IsAbstract)
@@ -56,7 +58,7 @@ namespace Mimir.API
 
         private static void RegisterCommandHandlers(IServiceCollection services)
         {
-            services.AddScoped<CommandDispatcher>();
+            services.AddScoped<ICommandDispatcher, CommandDispatcher>();
             var commandHandlers = Assembly.GetExecutingAssembly()
                 .GetTypes()
                 .Where(x => !x.IsAbstract)

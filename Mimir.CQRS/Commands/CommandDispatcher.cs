@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace Mimir.CQRS.Commands
 {
-    public class CommandDispatcher
+    public class CommandDispatcher : ICommandDispatcher
     {
         private readonly IServiceProvider _serviceProvider;
         public CommandDispatcher(IServiceProvider serviceProvider)
