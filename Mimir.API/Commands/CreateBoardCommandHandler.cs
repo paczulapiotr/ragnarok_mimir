@@ -12,33 +12,48 @@ namespace Mimir.API.Commands
     {
         private readonly MimirDbContext _dbContext;
 
-        public CreateBoardCommandHandler(MimirDbContext dbContext, IUserResolver userResolver)
+        public CreateBoardCommandHandler(MimirDbContext dbContext)
         {
             _dbContext = dbContext;
         }
 
         public async Task HandleAsync(Command command)
         {
-            var board = new KanbanBoard
+            using (var transaction = _dbContext.Database.BeginTransaction())
             {
-                Name = command.Name,
-                OwnerID = command.UserId,
-            };
-
-            if (command.ParticipantIds != null && command.ParticipantIds.Any())
-            {
-                var participants = command.ParticipantIds.ToHashSet();
-                participants.Remove(command.UserId);
-
-                board.UsersWithAccess = participants.Select(x => new KanbanBoardAccess
+                try
                 {
-                    Board = board,
-                    UserWithAccessID = x
-                }).ToList();
-            }
+                    var board = new KanbanBoard
+                    {
+                        Name = command.Name,
+                        OwnerID = command.UserId,
+                    };
 
-            _dbContext.KanbanBoards.Add(board);
-            await _dbContext.SaveChangesAsync();
+                    _dbContext.KanbanBoards.Add(board);
+                    await _dbContext.SaveChangesAsync();
+
+                    if (command.ParticipantIds != null && command.ParticipantIds.Any())
+                    {
+                        var participants = command.ParticipantIds.ToHashSet();
+                        participants.Remove(command.UserId);
+                        var boardAccess = participants.Select(x => new KanbanBoardAccess
+                        {
+                            BoardID = board.ID,
+                            UserWithAccessID = x
+                        }).ToList();
+
+                        _dbContext.KanbanBoardAccess.AddRange(boardAccess);
+                    }
+
+                    await _dbContext.SaveChangesAsync();
+                    transaction.Commit();
+                }
+                catch (Exception ex)
+                {
+                    transaction.Rollback();
+                    throw ex;
+                }
+            }
         }
 
         public class Command : ICommand

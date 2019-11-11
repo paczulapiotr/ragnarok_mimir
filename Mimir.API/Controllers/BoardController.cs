@@ -7,6 +7,7 @@ using Mimir.API.Commands;
 using Mimir.API.Controllers.Abstract;
 using Mimir.API.DTO;
 using Mimir.API.Queries;
+using Mimir.API.Result;
 using Mimir.CQRS.Commands;
 using Mimir.CQRS.Queries;
 using Mimir.Database;
@@ -34,7 +35,8 @@ namespace Mimir.API.Controllers
                 Name = dto.Name,
                 ParticipantIds = dto.ParticipantIds
             });
-            return Ok();
+            
+            return Json(new ApiJsonResponse(ApiMessage.Info($"'{dto.Name}' board has been created")));
         }
 
         [HttpGet]

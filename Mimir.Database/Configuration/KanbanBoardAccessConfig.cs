@@ -15,12 +15,12 @@ namespace Mimir.Database.Configuration
 
             builder.HasOne(x => x.Board)
                 .WithMany(x => x.UsersWithAccess)
-                .HasForeignKey(x => x.UserWithAccessID)
+                .HasForeignKey(x => x.BoardID)
                 .OnDelete(DeleteBehavior.NoAction);
 
             builder.HasOne(x => x.UserWithAccess)
                 .WithMany(x => x.BoardsWithAccess)
-                .HasForeignKey(x => x.BoardID)
+                .HasForeignKey(x => x.UserWithAccessID)
                 .OnDelete(DeleteBehavior.NoAction);
         }
     }
