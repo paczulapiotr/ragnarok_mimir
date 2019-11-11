@@ -35,7 +35,7 @@ namespace Mimir.API.Queries
 
             return await _dbContext.AppUsers
                 .Where(x => !usersAlreadyWithAccess.Any(y => y == x.ID))
-                .Where(x => x.Name.Contains(query.Name, StringComparison.OrdinalIgnoreCase))
+                .Where(x => x.Name.ToLower().Contains(query.Name.ToLower()))
                 .OrderBy(x => x.Name)
                 .Paginate(query.Page, query.PageSize)
                 .Select(x =>

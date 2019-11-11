@@ -62,12 +62,12 @@ namespace Mimir.API
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                using (var scope = app.ApplicationServices
-                    .GetRequiredService<IServiceScopeFactory>()
-                    .CreateScope())
-                {
-                    DataSeeder.Seed(scope.ServiceProvider);
-                }
+                //using (var scope = app.ApplicationServices
+                //    .GetRequiredService<IServiceScopeFactory>()
+                //    .CreateScope())
+                //{
+                //    DataSeeder.Seed(scope.ServiceProvider);
+                //}
             }
             else
             {
