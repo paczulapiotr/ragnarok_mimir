@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Mimir.API.Commands;
 using Mimir.API.Controllers.Abstract;
@@ -14,7 +12,7 @@ using Mimir.Database;
 
 namespace Mimir.API.Controllers
 {
-   
+
     public class BoardController : MimirController
     {
         private readonly IQueryDispatcher _queryDispatcher;
@@ -26,6 +24,35 @@ namespace Mimir.API.Controllers
             _commandDispatcher = commandDispatcher;
         }
 
+        [HttpGet("/api/[controller]/{id}")]
+        public async Task<IActionResult> Get(int id)
+        {
+            var result = await _queryDispatcher.DispatchAsync(
+            new GetBoardBaseQueryHandler.Query
+            {
+                BoardId = id,
+                UserId = GetUser().ID
+            });
+
+            return Ok(result);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Search([FromQuery]GetBoardsRequestDTO dto)
+        {
+            var result = await _queryDispatcher.DispatchAsync(
+            new GetBoardsQueryHandler.Query
+            {
+                Owned = dto.Owned,
+                Page = dto.Page,
+                PageSize = dto.PageSize,
+                Search = dto.Search,
+                UserId = GetUser().ID
+            });
+
+            return Ok(result);
+        }
+
         [HttpPut]
         public async Task<IActionResult> Create([FromBody]CreateBoardDTO dto)
         {
@@ -35,7 +62,7 @@ namespace Mimir.API.Controllers
                 Name = dto.Name,
                 ParticipantIds = dto.ParticipantIds
             });
-            
+
             return Json(new ApiJsonResponse(ApiMessage.Info($"'{dto.Name}' board has been created")));
         }
 
@@ -44,14 +71,67 @@ namespace Mimir.API.Controllers
         {
             var result = await _queryDispatcher.DispatchAsync(
                 new SearchBoardParticipantsQueryHandler.Query
+                {
+                    BoardId = dto.BoardId,
+                    Name = dto.Name,
+                    IgnoreUserIds = dto.IgnoreUserIds,
+                    Page = dto.Page,
+                    PageSize = dto.PageSize,
+                    UserId = GetUser().ID
+                });
+
+            return Ok(result);
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Remove(int id)
+        {
+            await _commandDispatcher.DispatchAsync(
+                new RemoveBoardCommandHandler.Command { BoardID = id, UserId = GetUser().ID });
+
+            return Ok();
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> Details(int id)
+        {
+            var result = await _queryDispatcher.DispatchAsync(
+                new GetBoardDetailsQueryHandler.Query { BoardId = id, UserId = GetUser().ID });
+
+            return Ok(result);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> Participants(int id)
+        {
+            var result = await _queryDispatcher.DispatchAsync(
+                new GetBoardParticipantsQueryHandler.Query { BoardId = id, UserId = GetUser().ID });
+
+            return Ok(result);
+        }
+
+        [HttpPatch("{id}")]
+        public async Task<IActionResult> Edit([FromRoute]int id, [FromBody]EditBoardRequestDTO dto)
+        {
+            await _commandDispatcher.DispatchAsync(
+                new EditBoardCommandHandler.Command { UserId = GetUser().ID, BoardId = id, Name = dto.Name });
+            
+             return Ok();
+        }
+
+        [HttpPatch]
+        public async Task<IActionResult> Participants([FromBody]EditBoardParticipantsRequestDTO dto)
+        {
+            var userId = GetUser().ID;
+            await _commandDispatcher.DispatchAsync(new EditBoardParticipantsCommandHandler.Command
             {
-                BoardId = dto.BoardId,
-                Name = dto.Name,
-                IgnoreUserIds = dto.IgnoreUserIds,
-                Page = dto.Page,
-                PageSize = dto.PageSize,
-                UserId = GetUser().ID
+                UserId = userId,
+                BoardId = dto.Id,
+                ParticipantIds = dto.ParticipantIds
             });
+
+            var result = await _queryDispatcher.DispatchAsync(
+                new GetBoardParticipantsQueryHandler.Query { BoardId = dto.Id, UserId = userId });
 
             return Ok(result);
         }
