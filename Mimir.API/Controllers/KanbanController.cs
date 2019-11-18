@@ -13,10 +13,10 @@ namespace Mimir.API.Controllers
 {
     public class KanbanController : MimirController
     {
-        private readonly CommandDispatcher _commandDispatcher;
-        private readonly QueryDispatcher _queryHandler;
+        private readonly ICommandDispatcher _commandDispatcher;
+        private readonly IQueryDispatcher _queryHandler;
 
-        public KanbanController(IUserResolver userResolver, CommandDispatcher commandDispatcher, QueryDispatcher queryHandler) 
+        public KanbanController(IUserResolver userResolver, ICommandDispatcher commandDispatcher, IQueryDispatcher queryHandler) 
             : base(userResolver)
         {
             _commandDispatcher = commandDispatcher;

@@ -10,7 +10,7 @@ using Mimir.Core.Extensions;
 
 namespace Mimir.API.Queries
 {
-    public class SearchBoardParticipantsQueryHandler : IQueryHandler<IEnumerable<AppUserBasicDTO>, SearchBoardParticipantsQueryHandler.Query>
+    public class SearchBoardParticipantsQueryHandler : IQueryHandler<PaginableList<AppUserBasicDTO>, SearchBoardParticipantsQueryHandler.Query>
     {
         private readonly MimirDbContext _dbContext;
 
@@ -19,8 +19,9 @@ namespace Mimir.API.Queries
             _dbContext = dbContext;
         }
 
-        public async Task<IEnumerable<AppUserBasicDTO>> HandleAsync(Query query)
+        public async Task<PaginableList<AppUserBasicDTO>> HandleAsync(Query query)
         {
+            query.Validate();
             var usersAlreadyWithAccess = query.BoardId.HasValue
                 ? _dbContext.KanbanBoards
                 .Where(x => x.ID == query.BoardId)
@@ -33,25 +34,27 @@ namespace Mimir.API.Queries
             if (query.IgnoreUserIds != null)
                 usersAlreadyWithAccess.UnionWith(query.IgnoreUserIds);
 
-            return await _dbContext.AppUsers
+            var qry = _dbContext.AppUsers
                 .Where(x => !usersAlreadyWithAccess.Any(y => y == x.ID))
-                .Where(x => x.Name.ToLower().Contains(query.Name.ToLower()))
-                .OrderBy(x => x.Name)
+                .Where(x => x.Name.ToLower().Contains(query.Name.ToLower()));
+
+            var totalCount = qry.Count();
+            var pagesCount = query.GetPageCount(totalCount);
+
+            return await qry.OrderBy(x => x.Name)
                 .Paginate(query.Page, query.PageSize)
                 .Select(x =>
                 new AppUserBasicDTO
                 {
                     Id = x.ID,
                     Name = x.Name
-                }).ToListAsync();
+                }).ToPaginableListAsync(query.Page, pagesCount, totalCount);
         }
 
-        public class Query : IQuery<IEnumerable<AppUserBasicDTO>>
+        public class Query : PaginationQuery<AppUserBasicDTO>
         {
             public int UserId { get; set; }
             public string Name { get; set; }
-            public int Page { get; set; } = 1;
-            public int PageSize { get; set; } = 5;
             public int? BoardId { get; set; }
             public IEnumerable<int> IgnoreUserIds { get; set; } = new List<int>();
         }

@@ -12,9 +12,9 @@ namespace Mimir.Core.Extensions
         /// <param name="page">Starting from page 1</param>
         /// <param name="pageSize"></param>
         /// <returns></returns>
-        public static IQueryable<T> Paginate<T>(this IQueryable<T> @this, int page = 1, int pageSize = 5)
-            => page < 1 
-            ? throw new ArgumentException("Page number cannot be lower than 1") 
-            : @this.Skip((page - 1) * pageSize).Take(pageSize);
+        public static IQueryable<T> Paginate<T>(this IQueryable<T> @this, int page = 0, int pageSize = 5)
+            => page < 0 
+            ? throw new ArgumentException("Page number cannot be lower than 0") 
+            : @this.Skip((page) * pageSize).Take(pageSize);
     }
 }
