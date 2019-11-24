@@ -43,8 +43,8 @@ namespace Mimir.API.Controllers
             return await KanbanStateResult(dto.BoardId);
         }
 
-        [HttpPost]
-        public async Task<IActionResult> AddColumn([FromBody] KanbanColumnAddDTO dto)
+        [HttpPut]
+        public async Task<IActionResult> Column([FromBody] KanbanColumnAddDTO dto)
         {
             var user = GetUser();
             await _commandDispatcher.DispatchAsync(
@@ -63,8 +63,8 @@ namespace Mimir.API.Controllers
             return await KanbanStateResult(dto.BoardId);
         }
 
-        [HttpPost]
-        public async Task<IActionResult> RemoveColumn([FromBody] KanbanColumnRemoveDTO dto)
+        [HttpDelete]
+        public async Task<IActionResult> Column([FromBody] KanbanColumnRemoveDTO dto)
         {
             var user = GetUser();
             await _commandDispatcher.DispatchAsync(

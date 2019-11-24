@@ -66,23 +66,6 @@ namespace Mimir.API.Controllers
             return Json(new ApiJsonResponse(ApiMessage.Info($"'{dto.Name}' board has been created")));
         }
 
-        [HttpGet]
-        public async Task<IActionResult> Participants([FromQuery]GetBoardParticipantsDTO dto)
-        {
-            var result = await _queryDispatcher.DispatchAsync(
-                new SearchBoardParticipantsQueryHandler.Query
-                {
-                    BoardId = dto.BoardId,
-                    Name = dto.Name,
-                    IgnoreUserIds = dto.IgnoreUserIds,
-                    Page = dto.Page,
-                    PageSize = dto.PageSize,
-                    UserId = GetUser().ID
-                });
-
-            return Ok(result);
-        }
-
         [HttpDelete("{id}")]
         public async Task<IActionResult> Remove(int id)
         {
@@ -101,15 +84,6 @@ namespace Mimir.API.Controllers
             return Ok(result);
         }
 
-        [HttpGet("{id}")]
-        public async Task<IActionResult> Participants(int id)
-        {
-            var result = await _queryDispatcher.DispatchAsync(
-                new GetBoardParticipantsQueryHandler.Query { BoardId = id, UserId = GetUser().ID });
-
-            return Ok(result);
-        }
-
         [HttpPatch("{id}")]
         public async Task<IActionResult> Edit([FromRoute]int id, [FromBody]EditBoardRequestDTO dto)
         {
@@ -117,6 +91,32 @@ namespace Mimir.API.Controllers
                 new EditBoardCommandHandler.Command { UserId = GetUser().ID, BoardId = id, Name = dto.Name });
             
              return Ok();
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Participants([FromQuery]GetBoardParticipantsDTO dto)
+        {
+            var result = await _queryDispatcher.DispatchAsync(
+                new SearchBoardParticipantsQueryHandler.Query
+                {
+                    BoardId = dto.BoardId,
+                    Name = dto.Name,
+                    IgnoreUserIds = dto.IgnoreUserIds,
+                    Page = dto.Page,
+                    PageSize = dto.PageSize,
+                    UserId = GetUser().ID
+                });
+
+            return Ok(result);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> Participants(int id)
+        {
+            var result = await _queryDispatcher.DispatchAsync(
+                new GetBoardParticipantsQueryHandler.Query { BoardId = id, UserId = GetUser().ID });
+
+            return Ok(result);
         }
 
         [HttpPatch]

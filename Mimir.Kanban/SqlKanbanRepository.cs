@@ -54,30 +54,28 @@ namespace Mimir.Kanban
 
         }
 
-        private int GetLastColumnIndex(int boardId)
+        private int GetNextColumnIndex(int boardId)
         {
-            return _dbContext.KanbanColumns
+            var indexes = _dbContext.KanbanColumns
                 .Where(x => x.KanbanBoardID == boardId)
-                .Max(x => x.Index) + 1;
+                .OrderBy(x => x.Index)
+                .Select(X => X.Index);
+            return indexes.Any() ? (indexes.Last() - -1) : 0;
         }
 
-        private int GetLastItemIndex(int columndId)
+        private int GetNextItemIndex(int columndId)
         {
-            return _dbContext.KanbanItems
+            var indexes =  _dbContext.KanbanItems
                 .Where(x => x.ColumnID == columndId)
-                .Max(x => x.Index) + 1;
+                .OrderBy(x => x.Index)
+                .Select(X => X.Index);
+
+            return indexes.Any() ? (indexes.Last() - -1) : 0;
         }
 
         public async Task AddColumnAsync(int boardId, string name, DateTime timestamp)
         {
             VerifyTimestamp(boardId, timestamp);
-
-            var newColumn = new KanbanColumn
-            {
-                Name = name,
-                Index = GetLastColumnIndex(boardId),
-                KanbanBoardID = boardId,
-            };
 
             var existingDuplicate = _dbContext.KanbanColumns
                 .Where(x => x.KanbanBoardID == boardId)
@@ -85,6 +83,13 @@ namespace Mimir.Kanban
 
             if (existingDuplicate)
                 throw new ArgumentException("Column name duplicate");
+            
+            var newColumn = new KanbanColumn
+            {
+                Name = name,
+                Index = GetNextColumnIndex(boardId),
+                KanbanBoardID = boardId,
+            };
 
             _dbContext.KanbanColumns.Add(newColumn);
             await _dbContext.SaveChangesAsync();
@@ -97,7 +102,7 @@ namespace Mimir.Kanban
             var newItem = new KanbanItem
             {
                 Name = name,
-                Index = GetLastItemIndex(columnId),
+                Index = GetNextItemIndex(columnId),
                 ColumnID = columnId,
             };
 
