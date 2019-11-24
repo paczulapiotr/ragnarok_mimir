@@ -54,7 +54,7 @@ namespace Mimir.API.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> Create([FromBody]CreateBoardDTO dto)
+        public async Task<IActionResult> Create([FromBody]CreateBoardRequestDTO dto)
         {
             await _commandDispatcher.DispatchAsync(new CreateBoardCommandHandler.Command
             {
@@ -94,7 +94,7 @@ namespace Mimir.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Participants([FromQuery]GetBoardParticipantsDTO dto)
+        public async Task<IActionResult> Participants([FromQuery]GetBoardParticipantsRequestDTO dto)
         {
             var result = await _queryDispatcher.DispatchAsync(
                 new SearchBoardParticipantsQueryHandler.Query

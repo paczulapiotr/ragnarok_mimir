@@ -10,7 +10,7 @@ using Mimir.Core.Extensions;
 
 namespace Mimir.API.Queries
 {
-    public class SearchBoardParticipantsQueryHandler : IQueryHandler<PaginableList<AppUserBasicDTO>, SearchBoardParticipantsQueryHandler.Query>
+    public class SearchBoardParticipantsQueryHandler : IQueryHandler<PaginableList<AppUserBasicResultDTO>, SearchBoardParticipantsQueryHandler.Query>
     {
         private readonly MimirDbContext _dbContext;
 
@@ -19,7 +19,7 @@ namespace Mimir.API.Queries
             _dbContext = dbContext;
         }
 
-        public async Task<PaginableList<AppUserBasicDTO>> HandleAsync(Query query)
+        public async Task<PaginableList<AppUserBasicResultDTO>> HandleAsync(Query query)
         {
             query.Validate();
             var usersAlreadyWithAccess = query.BoardId.HasValue
@@ -44,14 +44,14 @@ namespace Mimir.API.Queries
             return await qry.OrderBy(x => x.Name)
                 .Paginate(query.Page, query.PageSize)
                 .Select(x =>
-                new AppUserBasicDTO
+                new AppUserBasicResultDTO
                 {
                     Id = x.ID,
                     Name = x.Name
                 }).ToPaginableListAsync(query.Page, pagesCount, totalCount);
         }
 
-        public class Query : PaginationQuery<AppUserBasicDTO>
+        public class Query : PaginationQuery<AppUserBasicResultDTO>
         {
             public int UserId { get; set; }
             public string Name { get; set; }

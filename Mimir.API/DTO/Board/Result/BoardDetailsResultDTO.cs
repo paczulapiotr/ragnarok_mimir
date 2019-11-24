@@ -10,6 +10,6 @@ namespace Mimir.API.DTO.Board
         public int Id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
-        public IEnumerable<AppUserBasicDTO> Participants { get; set; }
+        public IEnumerable<AppUserBasicResultDTO> Participants { get; set; }
     }
 }

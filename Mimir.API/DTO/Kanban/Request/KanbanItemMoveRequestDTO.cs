@@ -2,7 +2,7 @@
 
 namespace Mimir.API.DTO
 {
-    public class KanbanItemMoveDTO
+    public class KanbanItemMoveRequestDTO
     {
         public int BoardId { get; set; }
         public int ItemId { get; set; }

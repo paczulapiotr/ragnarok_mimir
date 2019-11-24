@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Mimir.API.Queries
 {
-    public class KanbanStateQueryHandler : IQueryHandler<KanbanBoardDTO, KanbanStateQueryHandler.Query>
+    public class KanbanStateQueryHandler : IQueryHandler<KanbanBoardResultDTO, KanbanStateQueryHandler.Query>
     {
         private readonly MimirDbContext _dbContext;
         private readonly IMapper _mapper;
@@ -18,19 +18,19 @@ namespace Mimir.API.Queries
             _mapper = mapperConfiguration.CreateMapper();
         }
 
-        public async Task<KanbanBoardDTO> HandleAsync(Query query)
+        public async Task<KanbanBoardResultDTO> HandleAsync(Query query)
         {
             var board = await _dbContext.KanbanBoards
                 .AsNoTracking()
                 .Include(x => x.Columns).ThenInclude(x => x.Items)
                 .FirstOrDefaultAsync(x => x.ID == query.BoardId);
 
-            var result = _mapper.Map<KanbanBoardDTO>(board);
+            var result = _mapper.Map<KanbanBoardResultDTO>(board);
 
             return result;
         }
 
-        public class Query : IQuery<KanbanBoardDTO>
+        public class Query : IQuery<KanbanBoardResultDTO>
         {
             public Query(int boardId)
             {

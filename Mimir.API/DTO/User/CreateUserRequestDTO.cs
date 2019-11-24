@@ -1,8 +1,8 @@
 ﻿namespace Mimir.API.DTO
 {
-    public class AppUserBasicDTO
+    public class CreateUserRequestDTO
     {
+        public string AuthId { get; set; }
         public string Name { get; set; }
-        public int Id { get; set; }
     }
 }

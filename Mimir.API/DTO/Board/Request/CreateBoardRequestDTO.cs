@@ -2,7 +2,7 @@
 
 namespace Mimir.API.DTO
 {
-    public class CreateBoardDTO
+    public class CreateBoardRequestDTO
     {
         public string Name { get; set; }
         public IEnumerable<int> ParticipantIds{ get; set; }

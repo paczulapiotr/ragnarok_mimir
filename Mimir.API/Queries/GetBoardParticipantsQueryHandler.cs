@@ -11,7 +11,7 @@ using Mimir.Kanban;
 
 namespace Mimir.API.Queries
 {
-    public class GetBoardParticipantsQueryHandler : IQueryHandler<IEnumerable<AppUserBasicDTO>, GetBoardParticipantsQueryHandler.Query>
+    public class GetBoardParticipantsQueryHandler : IQueryHandler<IEnumerable<AppUserBasicResultDTO>, GetBoardParticipantsQueryHandler.Query>
     {
         private readonly MimirDbContext _dbContext;
         private readonly IKanbanAccessService _accessService;
@@ -22,7 +22,7 @@ namespace Mimir.API.Queries
             _accessService = accessService;
         }
 
-        public async Task<IEnumerable<AppUserBasicDTO>> HandleAsync(Query query)
+        public async Task<IEnumerable<AppUserBasicResultDTO>> HandleAsync(Query query)
         {
             if(!_accessService.HasAccess(query.UserId, query.BoardId))
             {
@@ -33,10 +33,10 @@ namespace Mimir.API.Queries
                 .Where(x => x.BoardID == query.BoardId)
                 .Select(x => new { x.UserWithAccessID, x.UserWithAccess.Name })
                 .ToListAsync())
-                .Select(x => new AppUserBasicDTO { Id = x.UserWithAccessID, Name = x.Name });
+                .Select(x => new AppUserBasicResultDTO { Id = x.UserWithAccessID, Name = x.Name });
         }
 
-        public class Query: IQuery<IEnumerable<AppUserBasicDTO>>
+        public class Query: IQuery<IEnumerable<AppUserBasicResultDTO>>
         {
             public int UserId { get; set; }
             public int BoardId { get; set; }

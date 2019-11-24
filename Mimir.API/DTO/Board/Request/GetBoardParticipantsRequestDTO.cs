@@ -1,6 +1,6 @@
 ﻿namespace Mimir.API.DTO
 {
-    public class GetBoardParticipantsDTO
+    public class GetBoardParticipantsRequestDTO
     {
         public string Name { get; set; }
         public int[] IgnoreUserIds { get; set; }

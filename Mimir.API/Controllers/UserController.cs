@@ -19,7 +19,7 @@ namespace Mimir.API.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> Create([FromBody]CreateUserDTO dto)
+        public async Task<IActionResult> Create([FromBody]CreateUserRequestDTO dto)
         {
             await _commandDispatcher.DispatchAsync(
                 new CreateUserCommandHandler.Command(dto.AuthId, dto.Name)

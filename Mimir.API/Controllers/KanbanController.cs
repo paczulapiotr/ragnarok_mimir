@@ -24,7 +24,7 @@ namespace Mimir.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> MoveItem([FromBody] KanbanItemMoveDTO dto)
+        public async Task<IActionResult> MoveItem([FromBody] KanbanItemMoveRequestDTO dto)
         {
             var user = GetUser();
             await _commandDispatcher.DispatchAsync(
@@ -34,7 +34,7 @@ namespace Mimir.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> MoveColumn([FromBody] KanbanColumnMoveDTO dto)
+        public async Task<IActionResult> MoveColumn([FromBody] KanbanColumnMoveRequestDTO dto)
         {
             var user = GetUser();
             await _commandDispatcher.DispatchAsync(
@@ -44,7 +44,7 @@ namespace Mimir.API.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> Column([FromBody] KanbanColumnAddDTO dto)
+        public async Task<IActionResult> Column([FromBody] KanbanColumnAddRequestDTO dto)
         {
             var user = GetUser();
             await _commandDispatcher.DispatchAsync(
@@ -54,7 +54,7 @@ namespace Mimir.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddItem([FromBody] KanbanItemAddDTO dto)
+        public async Task<IActionResult> AddItem([FromBody] KanbanItemAddRequestDTO dto)
         {
             var user = GetUser();
             await _commandDispatcher.DispatchAsync(
@@ -64,7 +64,7 @@ namespace Mimir.API.Controllers
         }
 
         [HttpDelete]
-        public async Task<IActionResult> Column([FromBody] KanbanColumnRemoveDTO dto)
+        public async Task<IActionResult> Column([FromBody] KanbanColumnRemoveRequestDTO dto)
         {
             var user = GetUser();
             await _commandDispatcher.DispatchAsync(
@@ -74,7 +74,7 @@ namespace Mimir.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> RemoveItem([FromBody] KanbanItemRemoveDTO dto)
+        public async Task<IActionResult> RemoveItem([FromBody] KanbanItemRemoveRequestDTO dto)
         {
             var user = GetUser();
             await _commandDispatcher.DispatchAsync(

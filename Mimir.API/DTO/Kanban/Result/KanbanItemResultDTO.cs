@@ -2,7 +2,7 @@
 
 namespace Mimir.API.DTO
 {
-    public class KanbanItemDTO
+    public class KanbanItemResultDTO
     {
         public int Id { get; set; }
         public string Name { get; set; }
