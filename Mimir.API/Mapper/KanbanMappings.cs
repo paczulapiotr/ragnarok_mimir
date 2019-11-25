@@ -4,7 +4,7 @@ using Mimir.Core.Models;
 
 namespace Mimir.API.Mapper
 {
-    public class KanbaMappings: Profile
+    public class KanbaMappings : Profile
     {
         public KanbaMappings()
         {
@@ -26,6 +26,15 @@ namespace Mimir.API.Mapper
                 .ForMember(dest => dest.Timestamp, opt => opt.MapFrom(x => x.Timestamp))
                 .ForMember(dest => dest.Columns, opt => opt.MapFrom(x => x.Columns));
 
+            CreateMap<AppUser, AppUserBasicResultDTO>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(x => x.ID))
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(x => x.Name));
+
+            CreateMap<KanbanItem, KanbanItemDetailsResultDTO>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(x => x.ID))
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(x => x.Name))
+                .ForMember(dest => dest.Description, opt => opt.MapFrom(x => x.Description))
+                .ForMember(dest => dest.Assignee, opt => opt.MapFrom(x => x.Assignee));
 
         }
     }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Mimir.Core.Extensions
@@ -16,5 +17,8 @@ namespace Mimir.Core.Extensions
             => page < 0 
             ? throw new ArgumentException("Page number cannot be lower than 0") 
             : @this.Skip((page) * pageSize).Take(pageSize);
+
+        public static T FirstOrElse<T>(this IEnumerable<T> @this, T @else = default(T)) 
+            => @this.Any() ? @this.First() : @else;
     }
 }

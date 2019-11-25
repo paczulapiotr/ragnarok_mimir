@@ -14,13 +14,13 @@ namespace Mimir.API.Controllers
     public class KanbanController : MimirController
     {
         private readonly ICommandDispatcher _commandDispatcher;
-        private readonly IQueryDispatcher _queryHandler;
+        private readonly IQueryDispatcher _queryDispatcher;
 
-        public KanbanController(IUserResolver userResolver, ICommandDispatcher commandDispatcher, IQueryDispatcher queryHandler) 
+        public KanbanController(IUserResolver userResolver, ICommandDispatcher commandDispatcher, IQueryDispatcher queryDispatcher) 
             : base(userResolver)
         {
             _commandDispatcher = commandDispatcher;
-            _queryHandler = queryHandler;
+            _queryDispatcher = queryDispatcher;
         }
 
         [HttpPost]
@@ -63,6 +63,13 @@ namespace Mimir.API.Controllers
             return await KanbanStateResult(dto.BoardId);
         }
 
+        [HttpGet("{id}")]
+        public async Task<IActionResult> Item(int id)
+        {
+            var result = await _queryDispatcher.DispatchAsync(new GetItemDetailsQueryHandler.Query(GetUser().ID, id));
+            return Ok(result);
+        }
+
         [HttpDelete]
         public async Task<IActionResult> Column([FromBody] KanbanColumnRemoveRequestDTO dto)
         {
@@ -73,8 +80,8 @@ namespace Mimir.API.Controllers
             return await KanbanStateResult(dto.BoardId);
         }
 
-        [HttpPost]
-        public async Task<IActionResult> RemoveItem([FromBody] KanbanItemRemoveRequestDTO dto)
+        [HttpDelete]
+        public async Task<IActionResult> Item([FromBody] KanbanItemRemoveRequestDTO dto)
         {
             var user = GetUser();
             await _commandDispatcher.DispatchAsync(
@@ -90,6 +97,6 @@ namespace Mimir.API.Controllers
         }
 
         private async Task<IActionResult> KanbanStateResult(int boardId)
-            => Ok(await _queryHandler.DispatchAsync(new KanbanStateQueryHandler.Query(boardId)));
+            => Ok(await _queryDispatcher.DispatchAsync(new KanbanStateQueryHandler.Query(boardId)));
     }
 }
