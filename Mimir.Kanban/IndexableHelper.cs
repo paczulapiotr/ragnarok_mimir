@@ -6,7 +6,7 @@ namespace Mimir.Kanban
 {
     public class IndexableHelper : IIndexableHelper
     {
-        private void RemapIndexes(IEnumerable<IIndexable> indexables, int startingIndex = 0)
+        public void RemapIndexes(IEnumerable<IIndexable> indexables, int startingIndex = 0)
         {
             foreach (var indexable in indexables.OrderBy(x => x.Index))
             {
@@ -14,7 +14,7 @@ namespace Mimir.Kanban
             }
         }
 
-        public void ReorderIndexable(IEnumerable<IIndexable> indexables, int oldIndex, int newIndex)
+        public void MoveIndexable(IEnumerable<IIndexable> indexables, int oldIndex, int newIndex)
         {
             var toMove = indexables.FirstOrDefault(x => x.Index == oldIndex);
             if (oldIndex > newIndex)
@@ -39,7 +39,7 @@ namespace Mimir.Kanban
             RemapIndexes(indexables);
         }
 
-        public void MoveIndexable(IEnumerable<IIndexable> indexables, IIndexable @new, int newIndex)
+        public void AddIndexable(IEnumerable<IIndexable> indexables, IIndexable @new, int newIndex)
         {
             indexables.Where(x => x.Index >= newIndex)
            .ToList()
@@ -48,6 +48,11 @@ namespace Mimir.Kanban
             @new.Index = newIndex;
 
             RemapIndexes(indexables.Concat(new[] { @new }));
+        }
+
+        public void ReorderIndexable(IEnumerable<IIndexable> indexables)
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

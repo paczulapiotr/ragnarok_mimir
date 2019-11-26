@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace Mimir.CQRS.Queries
 {
-    public class QueryDispatcher
+    public class QueryDispatcher : IQueryDispatcher
     {
         private readonly IServiceProvider _serviceProvider;
 

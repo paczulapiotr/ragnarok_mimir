@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Diagnostics;
 using System.Text;
 
 namespace Mimir.Core.Models
 {
-    public class KanbanColumn : TimestampRecord, IIndexable
+    [DebuggerDisplay("{Name}, ID: {ID}, Index: {Index}, BoardID: {KanbanBoardID}")]
+    public class KanbanColumn : IIndexable
     {
         [Key]
         public int ID { get; set; }

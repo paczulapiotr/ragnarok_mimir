@@ -1,79 +1,95 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Mimir.API.Commands;
 using Mimir.API.Controllers.Abstract;
 using Mimir.API.DTO;
 using Mimir.API.Queries;
+using Mimir.CQRS.Commands;
 using Mimir.CQRS.Queries;
-using Mimir.Kanban;
+using Mimir.Database;
 using System.Threading.Tasks;
 
 namespace Mimir.API.Controllers
 {
     public class KanbanController : MimirController
     {
-        private readonly IKanbanRepository _kanbanRepository;
-        private readonly QueryDispatcher _queryHandler;
+        private readonly ICommandDispatcher _commandDispatcher;
+        private readonly IQueryDispatcher _queryDispatcher;
 
-        public KanbanController(IKanbanRepository kanbanRepository, QueryDispatcher queryHandler)
+        public KanbanController(IUserResolver userResolver, ICommandDispatcher commandDispatcher, IQueryDispatcher queryDispatcher) 
+            : base(userResolver)
         {
-            _kanbanRepository = kanbanRepository;
-            _queryHandler = queryHandler;
+            _commandDispatcher = commandDispatcher;
+            _queryDispatcher = queryDispatcher;
         }
-        [AllowAnonymous]
+
         [HttpPost]
-        public Task<IActionResult> MoveItem([FromBody] KanbanItemMoveDTO dto)
+        public async Task<IActionResult> MoveItem([FromBody] KanbanItemMoveRequestDTO dto)
         {
-            _kanbanRepository.MoveItem(dto.BoardId, dto.ItemId, dto.Index, dto.ColumnDestId, dto.Timestamp);
+            var user = GetUser();
+            await _commandDispatcher.DispatchAsync(
+                new MoveKanbanItemCommandHandler.Command(user.ID, dto.BoardId, dto.ItemId, dto.Index, dto.ColumnDestId, dto.Timestamp));
 
-            return KanbanStateResult(dto.BoardId);
+            return await KanbanStateResult(dto.BoardId);
         }
 
-        [AllowAnonymous]
         [HttpPost]
-        public Task<IActionResult> MoveColumn([FromBody] KanbanColumnMoveDTO dto)
+        public async Task<IActionResult> MoveColumn([FromBody] KanbanColumnMoveRequestDTO dto)
         {
-            _kanbanRepository.MoveColumn(dto.BoardId, dto.ColumnId, dto.Index, dto.Timestamp);
+            var user = GetUser();
+            await _commandDispatcher.DispatchAsync(
+                new MoveKanbanColumnCommandHandler.Command(user.ID, dto.BoardId, dto.ColumnId, dto.Index, dto.Timestamp));
 
-            return KanbanStateResult(dto.BoardId);
+            return await KanbanStateResult(dto.BoardId);
         }
 
-        [AllowAnonymous]
+        [HttpPut]
+        public async Task<IActionResult> Column([FromBody] KanbanColumnAddRequestDTO dto)
+        {
+            var user = GetUser();
+            await _commandDispatcher.DispatchAsync(
+                new AddKanbanColumnCommandHandler.Command(user.ID, dto.BoardId, dto.Name, dto.Timestamp));
+
+            return await KanbanStateResult(dto.BoardId);
+        }
+
         [HttpPost]
-        public Task<IActionResult> AddColumn([FromBody] KanbanColumnAddDTO dto)
+        public async Task<IActionResult> AddItem([FromBody] KanbanItemAddRequestDTO dto)
         {
-            _kanbanRepository.AddColumn(dto.BoardId, dto.Name, dto.Timestamp);
+            var user = GetUser();
+            await _commandDispatcher.DispatchAsync(
+                new AddKanbanItemCommandHandler.Command(user.ID, dto.BoardId, dto.Name, dto.ColumnId, dto.Timestamp));
 
-            return KanbanStateResult(dto.BoardId);
+            return await KanbanStateResult(dto.BoardId);
         }
 
-        [AllowAnonymous]
-        [HttpPost]
-        public Task<IActionResult> AddItem([FromBody] KanbanItemAddDTO dto)
+        [HttpGet("{id}")]
+        public async Task<IActionResult> Item(int id)
         {
-            _kanbanRepository.AddItem(dto.BoardId, dto.Name, dto.ColumnId, dto.Timestamp);
-
-            return KanbanStateResult(dto.BoardId);
+            var result = await _queryDispatcher.DispatchAsync(new GetItemDetailsQueryHandler.Query(GetUser().ID, id));
+            return Ok(result);
         }
 
-        [AllowAnonymous]
-        [HttpPost]
-        public Task<IActionResult> RemoveColumn([FromBody] KanbanColumnRemoveDTO dto)
+        [HttpDelete]
+        public async Task<IActionResult> Column([FromBody] KanbanColumnRemoveRequestDTO dto)
         {
-            _kanbanRepository.RemoveColumn(dto.BoardId, dto.ColumnId, dto.Timestamp);
+            var user = GetUser();
+            await _commandDispatcher.DispatchAsync(
+                new RemoveKanbanColumnCommandHandler.Command(user.ID, dto.BoardId, dto.ColumnId, dto.Timestamp));
 
-            return KanbanStateResult(dto.BoardId);
+            return await KanbanStateResult(dto.BoardId);
         }
 
-        [AllowAnonymous]
-        [HttpPost]
-        public Task<IActionResult> RemoveItem([FromBody] KanbanItemRemoveDTO dto)
+        [HttpDelete]
+        public async Task<IActionResult> Item([FromBody] KanbanItemRemoveRequestDTO dto)
         {
-            _kanbanRepository.RemoveItem(dto.BoardId, dto.ItemId, dto.Timestamp);
+            var user = GetUser();
+            await _commandDispatcher.DispatchAsync(
+                new RemoveKanbanItemCommandHandler.Command(user.ID, dto.BoardId, dto.ItemId, dto.Timestamp));
 
-            return KanbanStateResult(dto.BoardId);
+            return await KanbanStateResult(dto.BoardId);
         }
 
-        [AllowAnonymous]
         [HttpGet("{boardId}")]
         public Task<IActionResult> Board(int boardId)
         {
@@ -81,6 +97,6 @@ namespace Mimir.API.Controllers
         }
 
         private async Task<IActionResult> KanbanStateResult(int boardId)
-            => Ok(await _queryHandler.DispatchAsync(new KanbanStateQueryHandler.Query(boardId))); 
+            => Ok(await _queryDispatcher.DispatchAsync(new KanbanStateQueryHandler.Query(boardId)));
     }
 }

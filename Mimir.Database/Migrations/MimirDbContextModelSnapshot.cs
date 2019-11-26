@@ -95,10 +95,6 @@ namespace Mimir.Database.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("Timestamp")
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("datetime2");
-
                     b.HasKey("ID");
 
                     b.HasIndex("KanbanBoardID");
@@ -131,10 +127,6 @@ namespace Mimir.Database.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("Timestamp")
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("datetime2");
-
                     b.HasKey("ID");
 
                     b.HasIndex("AssigneeID");
@@ -157,14 +149,14 @@ namespace Mimir.Database.Migrations
 
             modelBuilder.Entity("Mimir.Core.Models.KanbanBoardAccess", b =>
                 {
-                    b.HasOne("Mimir.Core.Models.AppUser", "UserWithAccess")
-                        .WithMany("BoardsWithAccess")
+                    b.HasOne("Mimir.Core.Models.KanbanBoard", "Board")
+                        .WithMany("UsersWithAccess")
                         .HasForeignKey("BoardID")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("Mimir.Core.Models.KanbanBoard", "Board")
-                        .WithMany("UsersWithAccess")
+                    b.HasOne("Mimir.Core.Models.AppUser", "UserWithAccess")
+                        .WithMany("BoardsWithAccess")
                         .HasForeignKey("UserWithAccessID")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();

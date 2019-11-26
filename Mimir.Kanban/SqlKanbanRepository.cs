@@ -1,7 +1,10 @@
-﻿using Mimir.Core.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using Mimir.Core.CommonExceptions;
+using Mimir.Core.Models;
 using Mimir.Database;
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Mimir.Kanban
 {
@@ -16,98 +19,199 @@ namespace Mimir.Kanban
             _indexableHelper = indexableHelper;
         }
 
-        private int GetLastColumnIndex(int boardId)
+        private void VerifyTimestamp(int boardId, DateTime timestamp)
         {
-            return _dbContext.KanbanColumns
+            var board = _dbContext.KanbanBoards.AsNoTracking().FirstOrDefault(x => x.ID == boardId);
+            if (board == null)
+                throw new ArgumentException("Board doesn't exist");
+            if (!board.CompareTimestamp(timestamp))
+                throw new ConflictException("Board version is different");
+        }
+
+        private void VerifyColumn(int boardId, int columnId)
+        {
+            var validColumnMove = _dbContext.KanbanColumns.Any(x => x.ID == columnId && x.KanbanBoardID == boardId);
+            if (!validColumnMove)
+                throw new ArgumentException("Column, Board arguments conflict");
+        }
+
+        private void VerifyItem(int boardId, int itemId, int? destColumnId = null)
+        {
+            var validItem = _dbContext.KanbanItems.Include(x=>x.Column)
+                .Any(x => x.ID == itemId && x.Column.KanbanBoardID == boardId);
+            if (!validItem)
+                throw new ArgumentException("Item, Board arguments conflict");
+
+            if (!destColumnId.HasValue)
+                return;
+
+            var validDestColumn = _dbContext.KanbanColumns
+                .Any(x => x.ID == destColumnId.Value && x.KanbanBoardID == boardId);
+
+            if(!validDestColumn)
+                throw new ArgumentException("Destination Column, Board arguments conflict");
+
+
+        }
+
+        private int GetNextColumnIndex(int boardId)
+        {
+            var indexes = _dbContext.KanbanColumns
                 .Where(x => x.KanbanBoardID == boardId)
-                .Max(x => x.Index) + 1;
+                .OrderBy(x => x.Index)
+                .Select(X => X.Index);
+            return indexes.Any() ? (indexes.Last() - -1) : 0;
         }
 
-        private int GetLastItemIndex(int columndId)
+        private int GetNextItemIndex(int columndId)
         {
-            return _dbContext.KanbanItems
+            var indexes =  _dbContext.KanbanItems
                 .Where(x => x.ColumnID == columndId)
-                .Max(x=>x.Index) + 1;
+                .OrderBy(x => x.Index)
+                .Select(X => X.Index);
+
+            return indexes.Any() ? (indexes.Last() - -1) : 0;
         }
 
-     
-
-        public bool AddColumn(int boardId, string name, DateTime timestamp)
+        public async Task AddColumnAsync(int boardId, string name, DateTime timestamp)
         {
+            VerifyTimestamp(boardId, timestamp);
+
+            var existingDuplicate = _dbContext.KanbanColumns
+                .Where(x => x.KanbanBoardID == boardId)
+                .Any(x => x.Name == name);
+
+            if (existingDuplicate)
+                throw new ArgumentException("Column name duplicate");
+            
             var newColumn = new KanbanColumn
             {
                 Name = name,
-                Index = GetLastColumnIndex(boardId),
+                Index = GetNextColumnIndex(boardId),
                 KanbanBoardID = boardId,
             };
 
             _dbContext.KanbanColumns.Add(newColumn);
-            _dbContext.SaveChanges();
-            return true;
+            await _dbContext.SaveChangesAsync();
         }
 
-        public bool AddItem(int boardId, string name, int columnId, DateTime timestamp)
+        public async Task AddItemAsync(int boardId, string name, int columnId, DateTime timestamp)
         {
+            VerifyTimestamp(boardId, timestamp);
+
             var newItem = new KanbanItem
             {
                 Name = name,
-                Index = GetLastItemIndex(columnId),
+                Index = GetNextItemIndex(columnId),
                 ColumnID = columnId,
             };
 
             _dbContext.KanbanItems.Add(newItem);
-            _dbContext.SaveChanges();
-            return true;
+            await _dbContext.SaveChangesAsync();
         }
 
-        public bool MoveColumn(int boardId, int columnId, int index, DateTime timestamp)
+        public async Task MoveColumnAsync(int boardId, int columnId, int index, DateTime timestamp)
         {
+            VerifyTimestamp(boardId, timestamp);
+            VerifyColumn(boardId, columnId);
+
             var columns = _dbContext.KanbanColumns
                 .Where(x => x.KanbanBoardID == boardId)
                 .ToList();
 
             var columnToMove = columns.FirstOrDefault(x => x.ID == columnId);
-            var columnsToRemap = columns.Where(x => x.Index >= columnToMove.Index);
 
-            _indexableHelper.ReorderIndexable(columnsToRemap, columnToMove.Index, index);
-            return true;
+            _indexableHelper.MoveIndexable(columns, columnToMove.Index, index);
+
+            await _dbContext.SaveChangesAsync();
         }
 
-        public bool MoveItem(int boardId, int itemId, int index, int? destColumnId, DateTime timestamp)
+        public async Task MoveItemAsync(int boardId, int itemId, int index, int? destColumnId, DateTime timestamp)
         {
-            var items = _dbContext.KanbanItems
-                .Where(x => x.ColumnID == destColumnId || x.ID == itemId)
-                .ToList();
-            var item = items.FirstOrDefault(x => x.ID == itemId);
+            VerifyTimestamp(boardId, timestamp);
+            VerifyItem(boardId, itemId, destColumnId);
 
-            if (!destColumnId.HasValue || item.ColumnID == destColumnId)
+            var itemToMove = _dbContext.KanbanItems
+                .Select(x => new { x.ID, x.ColumnID })
+                .FirstOrDefault(x => x.ID == itemId);
+            if (itemToMove == null)
+                throw new ArgumentException("Item does not exist");
+            
+            var destColumn = destColumnId ?? itemToMove.ColumnID;
+
+            if (destColumn != itemToMove.ColumnID)
             {
-                _indexableHelper.ReorderIndexable(items, item.Index, index);
+                MoveItemToAnotherColumn(itemToMove.ColumnID, destColumn, itemId, index);
             }
             else
             {
-                item.ColumnID = destColumnId.Value;
-                _indexableHelper.MoveIndexable(items, item, index);
+                MoveItemToIndex(itemToMove.ColumnID, itemId, index);
             }
-            _dbContext.SaveChanges();
-            return true; 
+            await _dbContext.SaveChangesAsync();
         }
 
-        public void RemoveItem(int boardId, int itemId, DateTime timestamp)
+        private void MoveItemToAnotherColumn(int sourceColumnId, int destColumnId, int itemId, int index)
         {
+            var items = _dbContext.KanbanItems
+                   .Where(x => x.ColumnID == destColumnId || x.ColumnID == sourceColumnId)
+                   .ToList();
+            var toMove = items.FirstOrDefault(x => x.ID == itemId);
+            if (toMove == null)
+                throw new ArgumentException("Item does not exist");
+
+            var destinationItems = items.Where(x => x.ColumnID == destColumnId).ToList();
+            var sourceItems = items.Where(x => x.ColumnID == toMove.ColumnID).ToList();
+            sourceItems.Remove(toMove);
+            toMove.ColumnID = destColumnId;
+
+            _indexableHelper.RemapIndexes(sourceItems);
+            _indexableHelper.AddIndexable(destinationItems, toMove, index);
+        }
+
+        private void MoveItemToIndex(int columnId, int itemId, int index)
+        {
+            var items = _dbContext.KanbanItems
+                  .Where(x => x.ColumnID == columnId)
+                  .ToList();
+            var toMove = items.FirstOrDefault(x => x.ID == itemId);
+            if (toMove == null)
+                throw new ArgumentException("Item does not exist");
+
+            _indexableHelper.MoveIndexable(items, toMove.Index, index);
+        }
+        public async Task RemoveItemAsync(int boardId, int itemId, DateTime timestamp)
+        {
+            VerifyTimestamp(boardId, timestamp);
+            VerifyItem(boardId, itemId);
+
             var item = _dbContext.KanbanItems.FirstOrDefault(x => x.ID == itemId);
+            if (item == null)
+                throw new ArgumentException("Item, Board arguments conflict");
+
+            var itemsToRemap = _dbContext.KanbanItems
+                .Where(x => x.ColumnID == item.ColumnID)
+                .ToList();
+            itemsToRemap.Remove(item);
             _dbContext.Remove(item);
-            _dbContext.SaveChanges();
+            _indexableHelper.RemapIndexes(itemsToRemap);
+            await _dbContext.SaveChangesAsync();
         }
 
-        public void RemoveColumn(int boardId, int columnId, DateTime timestamp)
+        public async Task RemoveColumnAsync(int boardId, int columnId, DateTime timestamp)
         {
-            var column = _dbContext.KanbanColumns.FirstOrDefault(x => x.ID == columnId);
+            VerifyTimestamp(boardId, timestamp);
+            VerifyColumn(boardId, columnId);
+
+            var columns = _dbContext.KanbanColumns.Where(x => x.KanbanBoardID == boardId).ToList();
+            var column = columns.FirstOrDefault(x => x.ID == columnId);
             if (column.Items.Any())
-                return;
-            
+                throw new ArgumentException("Cannot remove column with existing items");
+
+            columns.Remove(column);
             _dbContext.Remove(column);
-            _dbContext.SaveChanges();
+
+            _indexableHelper.RemapIndexes(columns);
+            await _dbContext.SaveChangesAsync();
         }
     }
 }
