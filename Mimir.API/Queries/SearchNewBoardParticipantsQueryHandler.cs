@@ -10,11 +10,11 @@ using Mimir.Core.Extensions;
 
 namespace Mimir.API.Queries
 {
-    public class SearchBoardParticipantsQueryHandler : IQueryHandler<PaginableList<AppUserBasicResultDTO>, SearchBoardParticipantsQueryHandler.Query>
+    public class SearchNewBoardParticipantsQueryHandler : IQueryHandler<PaginableList<AppUserBasicResultDTO>, SearchNewBoardParticipantsQueryHandler.Query>
     {
         private readonly MimirDbContext _dbContext;
 
-        public SearchBoardParticipantsQueryHandler(MimirDbContext dbContext)
+        public SearchNewBoardParticipantsQueryHandler(MimirDbContext dbContext)
         {
             _dbContext = dbContext;
         }
@@ -35,8 +35,10 @@ namespace Mimir.API.Queries
                 usersAlreadyWithAccess.UnionWith(query.IgnoreUserIds);
 
             var qry = _dbContext.AppUsers
-                .Where(x => !usersAlreadyWithAccess.Any(y => y == x.ID))
-                .Where(x => x.Name.ToLower().Contains(query.Name.ToLower()));
+                .Where(x => !usersAlreadyWithAccess.Any(y => y == x.ID));
+
+            if(!string.IsNullOrWhiteSpace(query.Name))
+                qry = qry.Where(x => x.Name.ToLower().Contains(query.Name.ToLower()));
 
             var totalCount = qry.Count();
             var pagesCount = query.GetPageCount(totalCount);
