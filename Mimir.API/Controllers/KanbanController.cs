@@ -48,17 +48,17 @@ namespace Mimir.API.Controllers
         {
             var user = GetUser();
             await _commandDispatcher.DispatchAsync(
-                new AddKanbanColumnCommandHandler.Command(user.ID, dto.BoardId, dto.Name, dto.Timestamp));
+                new AddKanbanColumnCommandHandler.Command(user.ID, dto.BoardId, dto.Name));
 
             return await KanbanStateResult(dto.BoardId);
         }
 
-        [HttpPost]
-        public async Task<IActionResult> AddItem([FromBody] KanbanItemAddRequestDTO dto)
+        [HttpPut]
+        public async Task<IActionResult> Item([FromBody] KanbanItemAddRequestDTO dto)
         {
             var user = GetUser();
             await _commandDispatcher.DispatchAsync(
-                new AddKanbanItemCommandHandler.Command(user.ID, dto.BoardId, dto.Name, dto.ColumnId, dto.Timestamp));
+                new AddKanbanItemCommandHandler.Command(user.ID, dto.BoardId, dto.Name, dto.ColumnId));
 
             return await KanbanStateResult(dto.BoardId);
         }
@@ -70,22 +70,44 @@ namespace Mimir.API.Controllers
             return Ok(result);
         }
 
+        [HttpPatch]
+        public async Task<IActionResult> Item([FromBody] KanbanItemEditRequestDTO dto)
+        {
+            var user = GetUser();
+            await _commandDispatcher.DispatchAsync(
+                new EditKanbanItemCommandHandler.Command(user.ID, dto.BoardId, dto.ItemId, dto.Name, dto.Description, dto.AssigneeId));
+
+            return await KanbanStateResult(dto.BoardId);
+        }
+
         [HttpDelete]
         public async Task<IActionResult> Column([FromBody] KanbanColumnRemoveRequestDTO dto)
         {
             var user = GetUser();
             await _commandDispatcher.DispatchAsync(
-                new RemoveKanbanColumnCommandHandler.Command(user.ID, dto.BoardId, dto.ColumnId, dto.Timestamp));
+                new RemoveKanbanColumnCommandHandler.Command(user.ID, dto.BoardId, dto.ColumnId));
 
             return await KanbanStateResult(dto.BoardId);
         }
+
+        [HttpPatch]
+        public async Task<IActionResult> Column([FromBody] KanbanColumnEditRequestDTO dto)
+        {
+            var user = GetUser();
+            await _commandDispatcher.DispatchAsync(
+                new EditKanbanColumnCommandHandler.Command(user.ID, dto.BoardId, dto.ColumnId, dto.Name));
+
+            return await KanbanStateResult(dto.BoardId);
+        }
+
+        
 
         [HttpDelete]
         public async Task<IActionResult> Item([FromBody] KanbanItemRemoveRequestDTO dto)
         {
             var user = GetUser();
             await _commandDispatcher.DispatchAsync(
-                new RemoveKanbanItemCommandHandler.Command(user.ID, dto.BoardId, dto.ItemId, dto.Timestamp));
+                new RemoveKanbanItemCommandHandler.Command(user.ID, dto.BoardId, dto.ItemId));
 
             return await KanbanStateResult(dto.BoardId);
         }

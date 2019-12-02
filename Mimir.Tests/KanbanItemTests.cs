@@ -27,7 +27,7 @@ namespace Mimir.Tests
 
             // When
             handler.HandleAsync(
-                new AddItem.Command(user.ID, board.ID, itemName, column.ID, board.Timestamp)).Wait();
+                new AddItem.Command(user.ID, board.ID, itemName, column.ID)).Wait();
 
             // Then
             var addedItem = column.Items.First(x => x.Name == itemName);
@@ -51,24 +51,7 @@ namespace Mimir.Tests
             // When/Then
             Assert.CatchAsync<ForbiddenException>(
                 async () => await handler.HandleAsync(
-                   new AddItem.Command(user.ID, board.ID, itemName, column.ID, board.Timestamp)));
-        }
-
-        [Test]
-        public void Should_Throw_Exception_On_Adding_Item_With_Old_Timestamp()
-        {
-            // Given
-            var board = context.KanbanBoards.Include(x => x.Columns).ThenInclude(x => x.Items).First();
-            var user = context.AppUsers.FirstOrDefault();
-            var handler = new AddItem(repository, CreateAccessServiceMock().Object);
-            var column = board.Columns.Where(x => x.Items.Any()).First();
-            var itemName = "Item name";
-            var itemsCount = column.Items.Count;
-
-            // When/Then
-            Assert.CatchAsync<ConflictException>(
-                async () => await handler.HandleAsync(
-                   new AddItem.Command(user.ID, board.ID, itemName, column.ID, DateTime.Now)));
+                   new AddItem.Command(user.ID, board.ID, itemName, column.ID)));
         }
 
         // Moving Item
@@ -194,7 +177,7 @@ namespace Mimir.Tests
             
             // When
             handler.HandleAsync(
-                   new RemoveItem.Command(user.ID, board.ID, itemToRemove.ID, board.Timestamp)).Wait();
+                   new RemoveItem.Command(user.ID, board.ID, itemToRemove.ID)).Wait();
 
             // Then
             var actualIndexes = column.Items.OrderBy(x => x.Index).Select(x => x.Index);
@@ -217,7 +200,7 @@ namespace Mimir.Tests
             // When
             Assert.CatchAsync<ArgumentException>(
                async () => await handler.HandleAsync(
-               new RemoveItem.Command(user.ID, wrongBoard.ID, itemToRemove.ID, wrongBoard.Timestamp)));
+               new RemoveItem.Command(user.ID, wrongBoard.ID, itemToRemove.ID)));
         }
 
         [Test]
@@ -233,23 +216,7 @@ namespace Mimir.Tests
             // When
             Assert.CatchAsync<ForbiddenException>(
                async () => await handler.HandleAsync(
-               new RemoveItem.Command(user.ID, board.ID, itemToRemove.ID, board.Timestamp)));
-        }
-
-        [Test]
-        public void Should_Throw_Exception_On_Removing_Item_With_Old_Timestamp()
-        {
-            // Given
-            var board = context.KanbanBoards.Include(x => x.Columns).First();
-            var user = context.AppUsers.FirstOrDefault();
-            var handler = new RemoveItem(repository, CreateAccessServiceMock().Object);
-            var column = board.Columns.Where(x => x.Items.Any()).OrderBy(x => x.Index).First();
-            var itemToRemove = column.Items.First();
-
-            // When
-            Assert.CatchAsync<ConflictException>(
-               async () => await handler.HandleAsync(
-               new RemoveItem.Command(user.ID, board.ID, itemToRemove.ID, DateTime.Now)));
+               new RemoveItem.Command(user.ID, board.ID, itemToRemove.ID)));
         }
     }
 }

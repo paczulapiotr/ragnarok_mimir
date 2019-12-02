@@ -15,22 +15,20 @@ namespace Mimir.API.Commands
         public override async Task HandleAsync(Command command)
         {
             await base.HandleAsync(command);
-            await _repository.AddItemAsync(command.BoardId, command.Name, command.ColumnId, command.Timestamp);
+            await _repository.AddItemAsync(command.BoardId, command.Name, command.ColumnId);
         }
 
         public class Command: KanbanBoardCommand
         {
             public Command() : base() { }
-            public Command(int userId, int boardId, string name, int columnId, DateTime timestamp) 
+            public Command(int userId, int boardId, string name, int columnId) 
                 : base(userId, boardId)
             {
                 Name = name;
                 ColumnId = columnId;
-                Timestamp = timestamp;
             }
             public string Name { get; }
             public int ColumnId { get; }
-            public DateTime Timestamp { get; }
         }
     }
 }

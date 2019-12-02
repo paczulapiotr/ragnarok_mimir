@@ -15,7 +15,7 @@ namespace Mimir.API.Commands
         public override async Task HandleAsync(Command command)
         {
             await base.HandleAsync(command);
-            await _repository.RemoveColumnAsync(command.BoardId, command.ColumnId, command.Timestamp);
+            await _repository.RemoveColumnAsync(command.BoardId, command.ColumnId);
         }
 
         public class Command: KanbanBoardCommand
@@ -24,14 +24,12 @@ namespace Mimir.API.Commands
             {
             }
 
-            public Command(int userId, int boardId, int columnId, DateTime timestamp) : base(userId, boardId)
+            public Command(int userId, int boardId, int columnId) : base(userId, boardId)
             {
                 ColumnId = columnId;
-                Timestamp = timestamp;
             }
 
             public int ColumnId { get; }
-            public DateTime Timestamp { get; }
         }
     }
 }

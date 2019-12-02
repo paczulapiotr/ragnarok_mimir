@@ -3,6 +3,7 @@ using Mimir.Core.CommonExceptions;
 using Mimir.Core.Models;
 using Mimir.Database;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -73,10 +74,8 @@ namespace Mimir.Kanban
             return indexes.Any() ? (indexes.Last() - -1) : 0;
         }
 
-        public async Task AddColumnAsync(int boardId, string name, DateTime timestamp)
+        public async Task AddColumnAsync(int boardId, string name)
         {
-            VerifyTimestamp(boardId, timestamp);
-
             var existingDuplicate = _dbContext.KanbanColumns
                 .Where(x => x.KanbanBoardID == boardId)
                 .Any(x => x.Name == name);
@@ -95,10 +94,8 @@ namespace Mimir.Kanban
             await _dbContext.SaveChangesAsync();
         }
 
-        public async Task AddItemAsync(int boardId, string name, int columnId, DateTime timestamp)
+        public async Task AddItemAsync(int boardId, string name, int columnId)
         {
-            VerifyTimestamp(boardId, timestamp);
-
             var newItem = new KanbanItem
             {
                 Name = name,
@@ -179,9 +176,8 @@ namespace Mimir.Kanban
 
             _indexableHelper.MoveIndexable(items, toMove.Index, index);
         }
-        public async Task RemoveItemAsync(int boardId, int itemId, DateTime timestamp)
+        public async Task RemoveItemAsync(int boardId, int itemId)
         {
-            VerifyTimestamp(boardId, timestamp);
             VerifyItem(boardId, itemId);
 
             var item = _dbContext.KanbanItems.FirstOrDefault(x => x.ID == itemId);
@@ -197,9 +193,8 @@ namespace Mimir.Kanban
             await _dbContext.SaveChangesAsync();
         }
 
-        public async Task RemoveColumnAsync(int boardId, int columnId, DateTime timestamp)
+        public async Task RemoveColumnAsync(int boardId, int columnId)
         {
-            VerifyTimestamp(boardId, timestamp);
             VerifyColumn(boardId, columnId);
 
             var columns = _dbContext.KanbanColumns.Where(x => x.KanbanBoardID == boardId).ToList();
@@ -212,6 +207,35 @@ namespace Mimir.Kanban
 
             _indexableHelper.RemapIndexes(columns);
             await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task EditColumnAsync(int boardId, int columnId, string name)
+        {
+            VerifyColumn(boardId, columnId);
+            var column = _dbContext.KanbanColumns.FirstOrDefault(x => x.ID == columnId);
+            column.Name = name;
+            await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task EditItemAsync(int boardId, int itemId, string name, string description, int? assigneeId)
+        {
+            VerifyItem(boardId, itemId);
+            var item = _dbContext.KanbanItems.FirstOrDefault(x => x.ID == itemId);
+            item.Name = name;
+            item.Description = description;
+            if (assigneeId.HasValue && !GetBoardUsers(boardId).Any(x => x.ID == assigneeId))
+                throw new ArgumentException("Invalid assignee");
+            item.AssigneeId = assigneeId;
+            await _dbContext.SaveChangesAsync();
+        }
+
+
+        public IEnumerable<AppUser> GetBoardUsers(int boardId)
+        {
+            var board = _dbContext.KanbanBoards.Include(x => x.UsersWithAccess).FirstOrDefault(x => x.ID == boardId);
+            var boardUsers = board.UsersWithAccess.Select(x => x.UserWithAccess).ToHashSet();
+            boardUsers.Add(board.Owner);
+            return boardUsers.OrderBy(x=>x.Name).ToList();
         }
     }
 }
