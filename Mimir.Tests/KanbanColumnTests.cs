@@ -22,7 +22,7 @@ namespace Mimir.Tests
             var handler = new AddColumn(repository, CreateAccessServiceMock().Object);
             var columnsPreAdd = board.Columns.ToList();
             // When
-            handler.HandleAsync(new AddColumn.Command(user.ID, board.ID, "New column", board.Timestamp)).Wait();
+            handler.HandleAsync(new AddColumn.Command(user.ID, board.ID, "New column")).Wait();
 
             // Then
             var indexes = board.Columns.OrderBy(x => x.Index).Select(x => x.Index);
@@ -47,7 +47,7 @@ namespace Mimir.Tests
             // When/Then
             Assert.CatchAsync<ArgumentException>(
                 async () => await handler.HandleAsync(
-                   new AddColumn.Command(user.ID, board.ID, existingColumn.Name, board.Timestamp)));
+                   new AddColumn.Command(user.ID, board.ID, existingColumn.Name)));
         }
 
         [Test]
@@ -61,7 +61,7 @@ namespace Mimir.Tests
             // When/Then
             Assert.CatchAsync<ForbiddenException>(
                 async () => await handler.HandleAsync(
-                   new AddColumn.Command(user.ID, board.ID, "New column", board.Timestamp)));
+                   new AddColumn.Command(user.ID, board.ID, "New column")));
         }
 
         [Test]
@@ -75,7 +75,7 @@ namespace Mimir.Tests
             // When/Then
             Assert.CatchAsync<ForbiddenException>(
                 async () => await handler.HandleAsync(
-                   new AddColumn.Command(user.ID, board.ID, "New column", DateTime.Now)));
+                   new AddColumn.Command(user.ID, board.ID, "New column")));
         }
 
 
@@ -163,7 +163,7 @@ namespace Mimir.Tests
             var columnCount = board.Columns.Count;
             // When
             handler.HandleAsync(
-                   new RemoveColumn.Command(user.ID, board.ID, column.ID, board.Timestamp)).Wait();
+                   new RemoveColumn.Command(user.ID, board.ID, column.ID)).Wait();
 
             // Then
             Assert.IsFalse(board.Columns.Any(x => x.ID == column.ID));
@@ -184,7 +184,7 @@ namespace Mimir.Tests
 
             // When
             handler.HandleAsync(
-                   new RemoveColumn.Command(user.ID, board.ID, column.ID, board.Timestamp)).Wait();
+                   new RemoveColumn.Command(user.ID, board.ID, column.ID)).Wait();
 
             // Then
             var indexes = board.Columns.OrderBy(x => x.Index).Select(x => x.Index);
@@ -207,7 +207,7 @@ namespace Mimir.Tests
             // When/Then
             Assert.CatchAsync<ArgumentException>(
                 async () => await handler.HandleAsync(
-                   new RemoveColumn.Command(user.ID, lastBoard.ID, column.ID, lastBoard.Timestamp)));
+                   new RemoveColumn.Command(user.ID, lastBoard.ID, column.ID)));
         }
 
         [Test]
@@ -223,7 +223,7 @@ namespace Mimir.Tests
             // When/Then
             Assert.CatchAsync<ArgumentException>(
                 async () => await handler.HandleAsync(
-                   new RemoveColumn.Command(user.ID, board.ID, columnId, board.Timestamp)));
+                   new RemoveColumn.Command(user.ID, board.ID, columnId)));
         }
 
         [Test]
@@ -239,23 +239,7 @@ namespace Mimir.Tests
             // When/Then
             Assert.CatchAsync<ForbiddenException>(
                 async () => await handler.HandleAsync(
-                   new RemoveColumn.Command(user.ID, board.ID, column.ID, board.Timestamp)));
-        }
-
-        [Test]
-        public void Should_Throw_Exception_On_Removing_Column_With_Old_Timestamp()
-        {
-            // Given
-            RemoveAllItems();
-            var board = context.KanbanBoards.Include(x => x.Columns).First();
-            var user = context.AppUsers.FirstOrDefault();
-            var handler = new RemoveColumn(repository, CreateAccessServiceMock().Object);
-            var column = board.Columns.First();
-
-            // When/Then
-            Assert.CatchAsync<ConflictException>(
-                async () => await handler.HandleAsync(
-                   new RemoveColumn.Command(user.ID, board.ID, column.ID, DateTime.Now)));
+                   new RemoveColumn.Command(user.ID, board.ID, column.ID)));
         }
 
         [Test]
@@ -270,7 +254,7 @@ namespace Mimir.Tests
             // When/Then
             Assert.CatchAsync<ArgumentException>(
                 async () => await handler.HandleAsync(
-                   new RemoveColumn.Command(user.ID, board.ID, column.ID, board.Timestamp)));
+                   new RemoveColumn.Command(user.ID, board.ID, column.ID)));
         }
 
     }

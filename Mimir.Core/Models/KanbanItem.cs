@@ -15,6 +15,8 @@ namespace Mimir.Core.Models
         [ForeignKey(nameof(ColumnID))]
         public KanbanColumn Column { get; set; }
         public int ColumnID { get; set; }
+        [ForeignKey(nameof(Assignee))]
+        public int? AssigneeId { get; set; }
         public AppUser Assignee { get; set; }
         public AppUser CreatedBy { get; set; }
     }

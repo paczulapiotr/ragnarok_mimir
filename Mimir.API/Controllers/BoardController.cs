@@ -94,14 +94,30 @@ namespace Mimir.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Participants([FromQuery]GetBoardParticipantsRequestDTO dto)
+        public async Task<IActionResult> NewParticipants([FromQuery]SearchNewBoardParticipantsRequestDTO dto)
         {
             var result = await _queryDispatcher.DispatchAsync(
-                new SearchBoardParticipantsQueryHandler.Query
+                new SearchNewBoardParticipantsQueryHandler.Query
                 {
                     BoardId = dto.BoardId,
                     Name = dto.Name,
                     IgnoreUserIds = dto.IgnoreUserIds,
+                    Page = dto.Page,
+                    PageSize = dto.PageSize,
+                    UserId = GetUser().ID
+                });
+
+            return Ok(result);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Participants([FromQuery]GetBoardParticipantsRequestDTO dto)
+        {
+            var result = await _queryDispatcher.DispatchAsync(
+                new SearchBoardAssigneesQueryHandler.Query
+                {
+                    BoardId = dto.BoardId,
+                    Name = dto.Name,
                     Page = dto.Page,
                     PageSize = dto.PageSize,
                     UserId = GetUser().ID
