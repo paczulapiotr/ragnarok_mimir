@@ -1,9 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Mimir.Controllers
 {
+    [AllowAnonymous]
     [Route("api/[controller]")]
     [ApiController]
     public class ValuesController : ControllerBase
@@ -12,9 +14,7 @@ namespace Mimir.Controllers
         [HttpGet]
         public ActionResult<IEnumerable<string>> Get()
         {
-            var claims = User;
-            var context = HttpContext;
-            return claims.Claims.Select(x => $"{x.Type}: {x.Value}").ToArray();
+            return new[] { "Uno", "Dos" };
         }
 
         // GET api/values/5

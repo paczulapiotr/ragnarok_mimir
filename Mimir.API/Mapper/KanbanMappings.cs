@@ -12,6 +12,7 @@ namespace Mimir.API.Mapper
             CreateMap<KanbanItem, KanbanItemResultDTO>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(x => x.ID))
                 .ForMember(dest => dest.Index, opt => opt.MapFrom(x => x.Index))
+                .ForMember(dest => dest.AssigneeName, opt => opt.MapFrom(x => x.Assignee.Name))
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(x => x.Name));
 
             CreateMap<KanbanColumn, KanbanColumnResultDTO>()

@@ -22,7 +22,9 @@ namespace Mimir.API.Queries
         {
             var board = await _dbContext.KanbanBoards
                 .AsNoTracking()
-                .Include(x => x.Columns).ThenInclude(x => x.Items)
+                .Include(x => x.Columns)
+                .ThenInclude(x => x.Items)
+                .ThenInclude(x => x.Assignee)
                 .FirstOrDefaultAsync(x => x.ID == query.BoardId);
 
             var result = _mapper.Map<KanbanBoardResultDTO>(board);
