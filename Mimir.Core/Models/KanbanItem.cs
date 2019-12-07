@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics;
 
@@ -19,5 +20,6 @@ namespace Mimir.Core.Models
         public int? AssigneeId { get; set; }
         public AppUser Assignee { get; set; }
         public AppUser CreatedBy { get; set; }
+        public IEnumerable<Comment> Comments { get; set; }
     }
 }
