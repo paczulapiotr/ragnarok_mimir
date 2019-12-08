@@ -26,7 +26,7 @@ namespace Mimir.Kanban
             if (board == null)
                 throw new ArgumentException("Board doesn't exist");
             if (!board.CompareTimestamp(timestamp))
-                throw new ConflictException("Board version is different");
+                throw new ConflictException("Board is unsynchronised");
         }
 
         private void VerifyColumn(int boardId, int columnId)
