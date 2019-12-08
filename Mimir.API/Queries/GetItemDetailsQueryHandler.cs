@@ -7,6 +7,8 @@ using Mimir.Kanban;
 using Mimir.Core.CommonExceptions;
 using Mimir.API.DTO;
 using AutoMapper;
+using System.Collections.Generic;
+using Mimir.API.DTO.Comment.Result;
 
 namespace Mimir.API.Queries
 {
@@ -27,6 +29,7 @@ namespace Mimir.API.Queries
         {
             var item = await _dbContext.KanbanItems
                 .Include(x => x.Column)
+                .Include(x => x.Comments).ThenInclude(x => x.Author)
                 .Include(x => x.Assignee)
                 .Where(x => x.ID == query.ItemId)
                 .FirstOrDefaultAsync();
@@ -41,8 +44,21 @@ namespace Mimir.API.Queries
                 throw new ForbiddenException();
             }
 
-            return _mapperFactory.CreateMapper()
+            var details = _mapperFactory.CreateMapper()
                 .Map<KanbanItemDetailsResultDTO>(item);
+            details.Comments = CommentsWithOwnership(details.Comments, query.UserId);
+
+            return details;
+        }
+
+        private IEnumerable<CommentDTO> CommentsWithOwnership(IEnumerable<CommentDTO> comments, int userId)
+        {
+            return comments.Select(x =>
+            {
+                if (x.AuthorId == userId)
+                    x.IsOwner = true;
+                return x;
+            }).ToList();
         }
 
         public class Query : IQuery<KanbanItemDetailsResultDTO>

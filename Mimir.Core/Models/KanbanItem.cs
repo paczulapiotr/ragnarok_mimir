@@ -20,6 +20,6 @@ namespace Mimir.Core.Models
         public int? AssigneeId { get; set; }
         public AppUser Assignee { get; set; }
         public AppUser CreatedBy { get; set; }
-        public IEnumerable<Comment> Comments { get; set; }
+        public List<Comment> Comments { get; set; }
     }
 }
