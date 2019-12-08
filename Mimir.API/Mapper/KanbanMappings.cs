@@ -27,7 +27,8 @@ namespace Mimir.API.Mapper
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(x => x.ID))
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(x => x.Name))
                 .ForMember(dest => dest.Timestamp, opt => opt.MapFrom(x => x.Timestamp))
-                .ForMember(dest => dest.Columns, opt => opt.MapFrom(x => x.Columns));
+                .ForMember(dest => dest.Columns, opt => opt.MapFrom(x => x.Columns))
+                .ForAllOtherMembers(opt => opt.Ignore());
 
             CreateMap<AppUser, AppUserBasicResultDTO>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(x => x.ID))

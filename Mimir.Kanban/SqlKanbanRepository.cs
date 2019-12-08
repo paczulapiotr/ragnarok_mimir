@@ -233,6 +233,7 @@ namespace Mimir.Kanban
         public IEnumerable<AppUser> GetBoardUsers(int boardId)
         {
             var board = _dbContext.KanbanBoards
+                .Include(x => x.Owner)
                 .Include(x => x.UsersWithAccess)
                 .ThenInclude(x=>x.UserWithAccess)
                 .FirstOrDefault(x => x.ID == boardId);

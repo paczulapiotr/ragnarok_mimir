@@ -119,6 +119,6 @@ namespace Mimir.API.Controllers
         }
 
         private async Task<IActionResult> KanbanStateResult(int boardId)
-            => Ok(await _queryDispatcher.DispatchAsync(new KanbanStateQueryHandler.Query(boardId)));
+            => Ok(await _queryDispatcher.DispatchAsync(new KanbanStateQueryHandler.Query(GetUser().ID, boardId)));
     }
 }
