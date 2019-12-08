@@ -12,7 +12,12 @@ namespace Mimir.Core.Models
         public AppUser Author { get; set; }
 
         [ForeignKey(nameof(Author))]
-        public int AuthorId { get; set; }
+        public int? AuthorId { get; set; }
+
+        public KanbanItem Item { get; set; }
+
+        [ForeignKey(nameof(Item))]
+        public int ItemId { get; set; }
 
         public string Content { get; set; }
 
