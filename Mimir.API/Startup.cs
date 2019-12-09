@@ -4,19 +4,20 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Mimir.API.Hubs;
 using Mimir.Database;
 using Microsoft.EntityFrameworkCore;
 namespace Mimir.API
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        public Startup(IConfiguration configuration, IWebHostEnvironment environment)
         {
             Configuration = configuration;
+            Environment = environment;
         }
 
         public IConfiguration Configuration { get; }
+        public IWebHostEnvironment Environment { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -24,31 +25,44 @@ namespace Mimir.API
             ServiceManager.RegisterServices(services);
             services.AddControllers();
             services.AddSignalR();
+            var connectionString = Environment.IsDevelopment()
+                ? Configuration.GetConnectionString("Local")
+                : Configuration.GetConnectionString("Azure");
             services.AddDbContext<MimirDbContext>(opts 
-                => opts.UseSqlServer(Configuration.GetConnectionString("Mimir")));
+                => opts.UseSqlServer(connectionString));
+
+            var authority = Environment.IsDevelopment() 
+                ? Configuration["Security:AuthorityUrl:Local"] 
+                : Configuration["Security:AuthorityUrl:Azure"];
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer("Bearer", options =>
             {
-                options.Authority = Configuration["Security:AuthorityUrl"];
-                options.RequireHttpsMetadata = false;
+                options.Authority = authority;
+                options.RequireHttpsMetadata = !Environment.IsDevelopment();
                 options.Audience = Configuration["Security:ApiName"];
             });
             services.AddCors(options =>
             {
                 // this defines a CORS policy called "default"
+                var clientOrigin = Environment.IsDevelopment()
+                                ? Configuration["Security:ClientUrl:Local"]
+                                : Configuration["Security:ClientUrl:Azure"];
                 options.AddPolicy("default", policy =>
                 {
                     policy
-                        .WithOrigins(Configuration["Security:ClientUrl"])
+                        .WithOrigins(clientOrigin)
                         .AllowAnyHeader()
                         .AllowAnyMethod()
                         .AllowCredentials();
                 });
                 // this defines a CORS policy for IdentityServer requests
+                var is4Origin = Environment.IsDevelopment()
+                                ? Configuration["Security:AuthorityUrl:Local"]
+                                : Configuration["Security:AuthorityUrl:Azure"];
                 options.AddPolicy("IdentityServer", policy =>
                 {
                     policy
-                        .WithOrigins(Configuration["Security:AuthorityUrl"])
+                        .WithOrigins(is4Origin)
                         .AllowAnyHeader()
                         .AllowAnyMethod()
                         .AllowCredentials();
@@ -82,7 +96,6 @@ namespace Mimir.API
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
-                endpoints.MapHub<MessageHub>("/message");
             });
         }
     }
