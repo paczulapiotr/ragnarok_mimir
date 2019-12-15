@@ -56,14 +56,15 @@ namespace Mimir.API.Controllers
         [HttpPut]
         public async Task<IActionResult> Create([FromBody]CreateBoardRequestDTO dto)
         {
-            await _commandDispatcher.DispatchAsync(new CreateBoardCommandHandler.Command
+            var command = new CreateBoardCommandHandler.Command
             {
                 UserId = GetUser().ID,
                 Name = dto.Name,
                 ParticipantIds = dto.ParticipantIds
-            });
+            };
+            await _commandDispatcher.DispatchAsync(command);
 
-            return Json(new ApiJsonResponse(ApiMessage.Info($"'{dto.Name}' board has been created")));
+            return Json(new ApiJsonResponse(command.BoardId, ApiMessage.Info($"'{dto.Name}' board has been created")));
         }
 
         [HttpDelete("{id}")]
@@ -90,7 +91,7 @@ namespace Mimir.API.Controllers
             await _commandDispatcher.DispatchAsync(
                 new EditBoardCommandHandler.Command { UserId = GetUser().ID, BoardId = id, Name = dto.Name });
             
-             return Ok();
+             return Json(new ApiJsonResponse(ApiMessage.Info($"Board name has been changed")));
         }
 
         [HttpGet]

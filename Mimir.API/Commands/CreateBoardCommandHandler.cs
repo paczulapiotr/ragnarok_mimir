@@ -31,6 +31,7 @@ namespace Mimir.API.Commands
 
                     _dbContext.KanbanBoards.Add(board);
                     await _dbContext.SaveChangesAsync();
+                    command.BoardId = board.ID;
 
                     if (command.ParticipantIds != null && command.ParticipantIds.Any())
                     {
@@ -58,6 +59,7 @@ namespace Mimir.API.Commands
 
         public class Command : ICommand
         {
+            public int BoardId { get; set; }
             public int UserId { get; set; }
             public string Name { get; set; }
             public  IEnumerable<int> ParticipantIds { get; set; }
