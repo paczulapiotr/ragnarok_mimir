@@ -6,6 +6,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Mimir.Database;
 using Microsoft.EntityFrameworkCore;
+using Mimir.API.Hubs;
+using System.Threading.Tasks;
+
 namespace Mimir.API
 {
     public class Startup
@@ -40,6 +43,18 @@ namespace Mimir.API
                 options.Authority = authority;
                 options.RequireHttpsMetadata = !Environment.IsDevelopment();
                 options.Audience = Configuration["Security:ApiName"];
+
+                // SignalR auth event
+                options.Events = new JwtBearerEvents
+                {
+                    OnMessageReceived = context =>
+                    {
+                        var accessToken = context.Request.Query["access_token"];
+                        if (!string.IsNullOrWhiteSpace(accessToken))
+                            context.Token = accessToken;
+                        return Task.CompletedTask;
+                    }
+                };
             });
             services.AddCors(options =>
             {
@@ -95,6 +110,7 @@ namespace Mimir.API
             app.UseAuthorization();
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapHub<BoardSynchronizationHub>("/ws/synchronize");
                 endpoints.MapControllers();
             });
         }

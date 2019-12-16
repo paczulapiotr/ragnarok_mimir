@@ -4,6 +4,7 @@ using Mimir.Core.Models;
 using Mimir.Database;
 using System;
 using System.Linq;
+using System.Linq.Expressions;
 
 namespace Mimir.Kanban
 {
@@ -13,7 +14,7 @@ namespace Mimir.Kanban
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IUserResolver _userResolver;
 
-        public KanbanAccessService(MimirDbContext dbContext, 
+        public KanbanAccessService(MimirDbContext dbContext,
             IHttpContextAccessor httpContextAccessor,
             IUserResolver userResolver)
         {
@@ -28,17 +29,11 @@ namespace Mimir.Kanban
         }
 
         public bool HasAccess(int userId, int boardId)
-        {
-            var userBoards = _dbContext.AppUsers.AsNoTracking()
-                .Include(x => x.BoardsWithAccess)
-                .Include(x => x.OwnedBoards)
-                .Where(x => x.ID == userId)
-                .SelectMany(x =>
-                    x.BoardsWithAccess.Select(x => x.BoardID)
-                    .Union(x.OwnedBoards.Select(x => x.ID)));
+            => HassAccessBase(user => user.ID == userId)(boardId);
 
-            return userBoards.Contains(boardId);
-        }
+        public bool HasAccess(string authId, int boardId) 
+            => HassAccessBase(user => user.AuthID == authId)(boardId);
+
         public bool HasAccess(int boardId)
         {
             var user = GetUser();
@@ -57,6 +52,23 @@ namespace Mimir.Kanban
         {
             var user = GetUser();
             return IsOwner(user.ID, boardId);
+        }
+
+        private Func<int, bool> HassAccessBase(Expression<Func<AppUser, bool>> userSelectorExpression)
+        {
+            return (int boardId) =>
+            {
+
+                var userBoards = _dbContext.AppUsers.AsNoTracking()
+                    .Include(x => x.BoardsWithAccess)
+                    .Include(x => x.OwnedBoards)
+                    .Where(userSelectorExpression)
+                    .SelectMany(x =>
+                        x.BoardsWithAccess.Select(x => x.BoardID)
+                        .Union(x.OwnedBoards.Select(x => x.ID)));
+
+                return userBoards.Contains(boardId);
+            };
         }
     }
 }
