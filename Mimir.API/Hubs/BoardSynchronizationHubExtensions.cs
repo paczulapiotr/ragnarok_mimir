@@ -7,10 +7,11 @@ namespace Mimir.API.Hubs
     {
         const string UPDATE_BOARD_METHOD = "UpdateBoard";
 
-        public static void NotifyOnBoardUpdate(this IHubContext<BoardSynchronizationHub> @this, int boardId)
+        public static void NotifyOnBoardUpdate(this IHubContext<BoardSynchronizationHub> @this, int invokingUserId, int boardId)
         {
             var connections = BoardSynchronizationHub.ActiveConnections
                 .Where(x => x.Value.BoardId == boardId)
+                .Where(x => x.Value.UserId != invokingUserId)
                 .Select(x => x.Key)
                 .ToList();
 

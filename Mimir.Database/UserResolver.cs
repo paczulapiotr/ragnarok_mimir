@@ -5,10 +5,6 @@ using Mimir.Core.Models;
 
 namespace Mimir.Database
 {
-    public interface IUserResolver
-    {
-        AppUser GetUser(ClaimsPrincipal claimsPrincipal);
-    }
 
     public class UserResolver : IUserResolver
     {
@@ -27,6 +23,11 @@ namespace Mimir.Database
                 throw new UnauthorizedException("Given user is not valid");
             }
 
+            return _dbContext.AppUsers.FirstOrDefault(x => x.AuthID == authId);
+        }
+
+        public AppUser GetUser(string authId)
+        {
             return _dbContext.AppUsers.FirstOrDefault(x => x.AuthID == authId);
         }
     }

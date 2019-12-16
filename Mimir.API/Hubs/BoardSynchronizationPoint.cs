@@ -2,7 +2,7 @@
 {
     public class BoardSynchronizationPoint
     {
-        public string UserIdentifier { get; set; }
+        public int UserId { get; set; }
         public int? BoardId { get; set; }
     }
 }

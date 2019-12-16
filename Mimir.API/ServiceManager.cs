@@ -8,6 +8,7 @@ using Mimir.Kanban;
 using Mimir.Database;
 using Microsoft.AspNetCore.Http;
 using Mimir.API.Repositories;
+using Mimir.API.Services;
 
 namespace Mimir.API
 {
@@ -20,9 +21,11 @@ namespace Mimir.API
             RegisterAutomapper(services);
             services.AddHttpContextAccessor();
             services.AddScoped<IIndexableHelper, IndexableHelper>();
-            services.AddScoped<IKanbanRepository, SqlKanbanRepository>();
+            services.AddScoped<SqlKanbanRepository>();
+            services.AddScoped<IKanbanRepository, SqlKanbanRepositoryHubDecorator>();
             services.AddScoped<IKanbanAccessService, KanbanAccessService>();
             services.AddScoped<IUserResolver, UserResolver>();
+            services.AddScoped<IContextUserResolver, ContextUserResolver>();
             services.AddScoped<IUserRepository, UserRepository>();
         }
 
