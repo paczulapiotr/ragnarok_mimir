@@ -19,7 +19,6 @@ namespace Mimir.Core.Models
         [ForeignKey(nameof(Assignee))]
         public int? AssigneeId { get; set; }
         public AppUser Assignee { get; set; }
-        public AppUser CreatedBy { get; set; }
         public List<Comment> Comments { get; set; }
     }
 }

@@ -34,7 +34,6 @@ namespace Mimir.Tests
             Assert.IsTrue(column.Items.Any(x => x.Name == itemName));
             Assert.AreEqual(itemsCount + 1, column.Items.Count);
             Assert.AreEqual(itemsCount, addedItem.Index);
-
         }
 
         [Test]

@@ -32,7 +32,7 @@ namespace Mimir.Tests.Abstract
                     AuthID ="user1",
                     Name="User Uno",
                 },
-                    new AppUser
+                new AppUser
                 {
                     AuthID ="user2",
                     Name="User Duo",

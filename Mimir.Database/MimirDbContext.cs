@@ -16,6 +16,7 @@ namespace Mimir.Database
         public DbSet<KanbanColumn> KanbanColumns { get; set; }
         public DbSet<KanbanItem> KanbanItems{ get; set; }
         public DbSet<KanbanBoardAccess> KanbanBoardAccess { get; set; }
+        public DbSet<Comment> Comments { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
