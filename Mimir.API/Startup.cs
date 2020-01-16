@@ -8,6 +8,7 @@ using Mimir.Database;
 using Microsoft.EntityFrameworkCore;
 using Mimir.API.Hubs;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace Mimir.API
 {
@@ -28,15 +29,11 @@ namespace Mimir.API
             ServiceManager.RegisterServices(services);
             services.AddControllers();
             services.AddSignalR();
-            var connectionString = Environment.IsDevelopment()
-                ? Configuration.GetConnectionString("Local")
-                : Configuration.GetConnectionString("Azure");
+            var connectionString = Configuration.GetConnectionString("Data");
             services.AddDbContext<MimirDbContext>(opts 
                 => opts.UseSqlServer(connectionString));
 
-            var authority = Environment.IsDevelopment() 
-                ? Configuration["Security:AuthorityUrl:Local"] 
-                : Configuration["Security:AuthorityUrl:Azure"];
+            var authority = Configuration["Security:AuthorityUrl"];
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer("Bearer", options =>
             {
@@ -59,9 +56,7 @@ namespace Mimir.API
             services.AddCors(options =>
             {
                 // this defines a CORS policy called "default"
-                var clientOrigin = Environment.IsDevelopment()
-                                ? Configuration["Security:ClientUrl:Local"]
-                                : Configuration["Security:ClientUrl:Azure"];
+                var clientOrigin = Configuration["Security:ClientUrl"];
                 options.AddPolicy("default", policy =>
                 {
                     policy
@@ -71,9 +66,7 @@ namespace Mimir.API
                         .AllowCredentials();
                 });
                 // this defines a CORS policy for IdentityServer requests
-                var is4Origin = Environment.IsDevelopment()
-                                ? Configuration["Security:AuthorityUrl:Local"]
-                                : Configuration["Security:AuthorityUrl:Azure"];
+                var is4Origin = Configuration["Security:AuthorityUrl"];
                 options.AddPolicy("IdentityServer", policy =>
                 {
                     policy
@@ -86,17 +79,12 @@ namespace Mimir.API
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILogger<Startup> logger)
         {
+            app.MigrateDatabase(logger);
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                //using (var scope = app.ApplicationServices
-                //    .GetRequiredService<IServiceScopeFactory>()
-                //    .CreateScope())
-                //{
-                //    DataSeeder.Seed(scope.ServiceProvider);
-                //}
             }
             else
             {
