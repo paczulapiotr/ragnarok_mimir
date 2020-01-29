@@ -23,9 +23,7 @@ namespace Mimir.API
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    webBuilder.UseStartup<Startup>()
-                    .UseUrls("http://localhost:5001/")
-                    .UseEnvironment("DEVELOPMENT");
+                    webBuilder.UseStartup<Startup>();
                 });
     }
 }
